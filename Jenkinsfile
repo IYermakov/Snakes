@@ -28,6 +28,31 @@ pipeline {
         }
       }
     }
+    stage("Create Test Env") {
+      steps {
+        script {
+            echo "======== Start Docker Container ========"
+            testContainer = dockerImage.run('-p 8090:8080 --name test')
+        }
+      }
+    }
+    stage("Test") {
+      steps {
+        script {
+          echo "======== Check Access ========="
+          sh 'sleep 30'
+          sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
+        }
+      }
+    }
+    stage("Remove Test Env") {
+      steps {
+        script {
+          echo "======== Disable and Remove Container ========="
+          testContainer.stop()
+        }
+      }
+    }
     stage("Push artifact to ECR") {
       steps {
         script {
