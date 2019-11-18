@@ -70,5 +70,12 @@ pipeline {
         sh 'docker images'
       }
     }
+    stage("Create stack") {
+      // when { tag "release-*" }
+      steps {
+        git(url: 'https://github.com/IYermakov/DevOpsA3Training.git', branch: 'ecs-snakes')
+        // sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${dockerImage} --region us-east-1"
+      }
+    }
   }
 }
