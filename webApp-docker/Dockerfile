@@ -1,0 +1,34 @@
+FROM alpine
+RUN apk add openjdk8
+RUN apk --update add --no-cache openssh bash \
+  && sed -i s/#PermitRootLogin.*/PermitRootLogin\ yes/ /etc/ssh/sshd_config \
+  && echo "root:root" | chpasswd \
+  && rm -rf /var/cache/apk/* \
+  && sed -ie 's/#Port 22/Port 22/g' /etc/ssh/sshd_config \
+  && sed -ri 's/#HostKey \/etc\/ssh\/ssh_host_key/HostKey \/etc\/ssh\/ssh_host_key/g' /etc/ssh/sshd_config \
+  && sed -ir 's/#HostKey \/etc\/ssh\/ssh_host_rsa_key/HostKey \/etc\/ssh\/ssh_host_rsa_key/g' /etc/ssh/sshd_config \
+  && sed -ir 's/#HostKey \/etc\/ssh\/ssh_host_dsa_key/HostKey \/etc\/ssh\/ssh_host_dsa_key/g' /etc/ssh/sshd_config \
+  && sed -ir 's/#HostKey \/etc\/ssh\/ssh_host_ecdsa_key/HostKey \/etc\/ssh\/ssh_host_ecdsa_key/g' /etc/ssh/sshd_config \
+  && sed -ir 's/#HostKey \/etc\/ssh\/ssh_host_ed25519_key/HostKey \/etc\/ssh\/ssh_host_ed25519_key/g' /etc/ssh/sshd_config \
+  && /usr/bin/ssh-keygen -A \
+  && ssh-keygen -t rsa -b 4096 -f  /etc/ssh/ssh_host_key
+# CMD ["/usr/sbin/sshd","-D"]
+# CMD [ "/usr/sbin/sshd", "-D"]
+# RUN yum install -y java-1.8.0-openjdk
+#RUN yum install -y tomcat
+#RUN yum install -y tomcat-webapps tomcat-admin-webapps tomcat-docs-webapp tomcat-javadoc
+#RUN mv /var/lib/tomcat/webapps/ROOT/ /var/lib/tomcat/webapps/default-ROOT-backup
+#COPY webapp /var/lib/tomcat/webapps/ROOT/
+#HEALTHCHECK --interval=5s --timeout=10s --retries=5 CMD curl -sS 127.0.0.1:8080 || exit 1
+RUN mkdir -p /usr/local/tomcat
+RUN cd /usr/local/tomcat
+RUN wget http://apache.volia.net/tomcat/tomcat-8/v8.5.47/bin/apache-tomcat-8.5.47.tar.gz
+RUN tar xzf apache-tomcat-8.5.47.tar.gz -C /usr/local/tomcat
+RUN cd /usr/local/tomcat && ls -la
+RUN cd /usr/local/tomcat/apache-tomcat-8.5.47/bin/
+RUN /usr/local/tomcat/apache-tomcat-8.5.47/bin/catalina.sh start
+RUN sleep 5s
+CMD [ "/usr/sbin/sshd", "-D"]
+# HEALTHCHECK --interval=5s --timeout=10s --retries=5 CMD curl -sS 127.0.0.1:8080 || exit 1
+EXPOSE :8080
+EXPOSE :22
