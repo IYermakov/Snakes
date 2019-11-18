@@ -73,7 +73,7 @@ pipeline {
       }
     }
     stage("Create stack") {
-      when { tag "release-*" }
+      when { tag "0.0.1" }
       steps {
         git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}")
         sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${env.BUILD_ID} --region us-east-1"
