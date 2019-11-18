@@ -69,7 +69,7 @@ pipeline {
       steps {
         echo "====================== Removing images ====================="
         sh 'docker image prune -af'
-        // sh 'docker images'
+        sh 'docker images'
       }
     }
     stage("Create stack") {
