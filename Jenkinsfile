@@ -12,7 +12,9 @@ pipeline {
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
-    RepoName = 'snakes'
+    AppRepoName = 'snakes'
+    OPSRepoURL = 'https://github.com/IYermakov/DevOpsA3Training.git'
+    OPSRepoBranch = 'ecs-snakes'
 
   }
   stages {
@@ -24,7 +26,7 @@ pipeline {
     stage("Build Docker Image") {
       steps {
         script {
-          dockerImage = docker.build("${ECRURI}/${RepoName}:${env.BUILD_ID}")
+          dockerImage = docker.build("${ECRURI}/${AppRepoName}:${env.BUILD_ID}")
         }
       }
     }
@@ -73,8 +75,8 @@ pipeline {
     stage("Create stack") {
       when { tag "release-*" }
       steps {
-        git(url: 'https://github.com/IYermakov/DevOpsA3Training.git', branch: 'ecs-snakes')
-        sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${RepoName}:${env.BUILD_ID} --region us-east-1"
+        git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}")
+        sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${env.BUILD_ID} --region us-east-1"
       }
     }
   }
