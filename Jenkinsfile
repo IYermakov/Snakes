@@ -65,9 +65,17 @@ pipeline {
     stage("Test") {
       steps {
         script {
-          echo "======== Check Access ========="
-          sh 'sleep 30'
-          sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
+          try {
+            echo "======== Check Access ========="
+            sh 'sleep 30'
+            sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
+            }
+          }
+          catch (err) {
+            currentBuild.result = 'FAILURE'
+            emailext body: "${err}. Curl Test Failed, check logs.", subject: 'JOB FAILED', to: 'vecinomio@gmail.com'
+          }
+          echo "result is: ${currentBuild.currentResult}"
         }
       }
     }
