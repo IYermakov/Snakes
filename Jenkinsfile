@@ -27,10 +27,10 @@ pipeline {
     stage("Build Docker Image") {
       steps {
         script {
-          if (env.TAG_NAME == NULL){
-            ImageTag = env.BUILD_NUMBER
-          }else{
-            ImageTag = env.TAG_NAME
+          // if (env.TAG_NAME == NULL){
+          //   ImageTag = env.BUILD_NUMBER
+          // }else{
+          //   ImageTag = env.TAG_NAME
           dockerImage = docker.build("${ECRURI}/${AppRepoName}:${ImageTag}")
         }
       }
