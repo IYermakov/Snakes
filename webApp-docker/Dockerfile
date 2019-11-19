@@ -20,14 +20,17 @@ RUN apk --update add --no-cache openssh bash \
 #RUN mv /var/lib/tomcat/webapps/ROOT/ /var/lib/tomcat/webapps/default-ROOT-backup
 #COPY webapp /var/lib/tomcat/webapps/ROOT/
 #HEALTHCHECK --interval=5s --timeout=10s --retries=5 CMD curl -sS 127.0.0.1:8080 || exit 1
-RUN mkdir -p /usr/local/tomcat
-RUN cd /usr/local/tomcat
-RUN wget http://apache.volia.net/tomcat/tomcat-8/v8.5.47/bin/apache-tomcat-8.5.47.tar.gz
-RUN tar xzf apache-tomcat-8.5.47.tar.gz -C /usr/local/tomcat
-RUN cd /usr/local/tomcat && ls -la
-RUN cd /usr/local/tomcat/apache-tomcat-8.5.47/bin/
-RUN /usr/local/tomcat/apache-tomcat-8.5.47/bin/catalina.sh start
-RUN sleep 5s
+RUN cd /usr/local/ \
+  && wget http://apache.volia.net/tomcat/tomcat-8/v8.5.47/bin/apache-tomcat-8.5.47.tar.gz \
+  && tar xzf apache-tomcat-8.5.47.tar.gz \
+  && pwd && ls -la \
+  && mv apache-tomcat-8.5.47/ tomcat/ \
+  && pwd && ls -la \
+  && rm apache-tomcat-8.5.47.tar.gz \
+  && cd tomcat/bin/ \
+  && ./catalina.sh start \
+  && echo $?
+# CMD [ "/usr/local/tomcat/bin/catalina.sh", "start"]
 CMD [ "/usr/sbin/sshd", "-D"]
 # HEALTHCHECK --interval=5s --timeout=10s --retries=5 CMD curl -sS 127.0.0.1:8080 || exit 1
 EXPOSE :8080
