@@ -26,7 +26,8 @@ pipeline {
     stage("Build Docker Image") {
       steps {
         script {
-          dockerImage = docker.build("${ECRURI}/${AppRepoName}:${env.BUILD_ID}")
+          echo "${TAG_NAME}"
+          dockerImage = docker.build("${ECRURI}/${AppRepoName}:${TAG_NAME}")
         }
       }
     }
@@ -76,7 +77,7 @@ pipeline {
       when { buildingTag() }
       steps {
         git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}")
-        sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${env.BUILD_ID} --region us-east-1"
+        sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${TAG_NAME} --region us-east-1"
       }
     }
   }
