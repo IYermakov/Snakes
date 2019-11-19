@@ -18,72 +18,83 @@ pipeline {
     ImageTag = ""
 
   }
-  stages {
-    stage("Build app") {
-      steps {
-        sh 'cd eb-tomcat-snakes && ./build.sh'
-      }
-    }
-    stage("Build Docker Image") {
-      steps {
-        script {
-          if (env.TAG_NAME) {
-            ImageTag = env.TAG_NAME
-          } else {
-            ImageTag = env.BUILD_NUMBER
-          }
-          dockerImage = docker.build("${ECRURI}/${AppRepoName}:${ImageTag}")
-        }
-      }
-    }
-    stage("Create Test Env") {
-      steps {
-        script {
-            echo "======== Start Docker Container ========"
-            testContainer = dockerImage.run('-p 8090:8080 --name test')
-        }
-      }
-    }
-    stage("Test") {
-      steps {
-        script {
-          echo "======== Check Access ========="
-          sh 'sleep 30'
-          sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
-        }
-      }
-    }
-    stage("Remove Test Env") {
-      steps {
-        script {
-          echo "======== Disable and Remove Container ========="
-          testContainer.stop()
-        }
-      }
-    }
-    stage("Push artifact to ECR") {
-      steps {
-        script {
-          sh 'eval $(aws ecr get-login --no-include-email --region us-east-1)'
-          docker.withRegistry("https://${ECRURI}") {
-            dockerImage.push()
+  script {
+    try {
+      stages {
+        stage("Build app") {
+          steps {
+            sh 'cd eb-tomcat-snakes && ./build.sh'
           }
         }
+        stage("Build Docker Image") {
+          steps {
+            script {
+              if (env.TAG_NAME) {
+                ImageTag = env.TAG_NAME
+              } else {
+                ImageTag = env.BUILD_NUMBER
+              }
+              dockerImage = docker.build("${ECRURI}/${AppRepoName}:${ImageTag}")
+            }
+          }
+        }
+        stage("Create Test Env") {
+          steps {
+            script {
+                echo "======== Start Docker Container ========"
+                testContainer = dockerImage.run('-p 8090:8080 --name test')
+            }
+          }
+        }
+        stage("Test") {
+          steps {
+            script {
+              echo "======== Check Access ========="
+              sh 'sleep 30'
+              sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
+            }
+          }
+        }
+        stage("Remove Test Env") {
+          steps {
+            script {
+              echo "======== Disable and Remove Container ========="
+              testContainer.stop()
+            }
+          }
+        }
+        stage("Push artifact to ECR") {
+          steps {
+            script {
+              sh '$(aws ecr get-login --no-include-email --region us-east-1)'
+              docker.withRegistry("https://${ECRURI}") {
+                dockerImage.push()
+              }
+            }
+          }
+        }
+        stage("CleanUp") {
+          steps {
+            echo "====================== Removing images ====================="
+            sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
+            sh 'docker images'
+          }
+        }
+        stage("Create stack") {
+          when { buildingTag() }
+          steps {
+            git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}")
+            sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${ImageTag} --region us-east-1"
+          }
+        }
       }
+      currentBuild.result = 'SUCCESS'
+      emailext body: 'Stack was successfully deployed.', subject: 'Deploy Successful', to: 'vecinomio@gmail.com'
     }
-    stage("CleanUp") {
-      steps {
-        echo "====================== Removing images ====================="
-        sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
-        sh 'docker images'
-      }
+    catch (err) {
+      currentBuild.result = 'FAILURE'
+      emailext body: "${err}. Deploy Failed, check logs.", subject: 'Deploy FAILED', to: 'vecinomio@gmail.com'
     }
-    stage("Create stack") {
-      when { buildingTag() }
-      steps {
-        git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}")
-        sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${ImageTag} --region us-east-1"
-      }
-    }
+  echo "result is: ${currentBuild.currentResult}"
   }
 }
