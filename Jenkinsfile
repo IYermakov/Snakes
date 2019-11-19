@@ -18,9 +18,9 @@ pipeline {
     ImageTag = ""
 
   }
-  script {
-    try {
-      stages {
+  stages {
+    script {
+      try {
         stage("Build app") {
           steps {
             sh 'cd eb-tomcat-snakes && ./build.sh'
@@ -87,14 +87,14 @@ pipeline {
             sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${ImageTag} --region us-east-1"
           }
         }
+        currentBuild.result = 'SUCCESS'
+        emailext body: 'Stack was successfully deployed.', subject: 'Deploy Successful', to: 'vecinomio@gmail.com'
       }
-      currentBuild.result = 'SUCCESS'
-      emailext body: 'Stack was successfully deployed.', subject: 'Deploy Successful', to: 'vecinomio@gmail.com'
+      catch (err) {
+        currentBuild.result = 'FAILURE'
+        emailext body: "${err}. Deploy Failed, check logs.", subject: 'Deploy FAILED', to: 'vecinomio@gmail.com'
+      }
+    echo "result is: ${currentBuild.currentResult}"
     }
-    catch (err) {
-      currentBuild.result = 'FAILURE'
-      emailext body: "${err}. Deploy Failed, check logs.", subject: 'Deploy FAILED', to: 'vecinomio@gmail.com'
-    }
-  echo "result is: ${currentBuild.currentResult}"
   }
 }
