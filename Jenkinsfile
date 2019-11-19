@@ -26,7 +26,7 @@ pipeline {
             sh 'cd eb0-tomcat-snakes && ./build.sh'
             currentBuild.result = 'SUCCESS'
           }
-          catch (err) {
+          catch (exc) {
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Build Application Failed, check logs.", subject: 'JOB FAILED', to: 'vecinomio@gmail.com'
             throw
