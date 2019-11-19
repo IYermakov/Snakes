@@ -1,5 +1,7 @@
 FROM alpine
+
 RUN apk add openjdk8
+
 RUN apk --update add --no-cache openssh bash \
   && sed -i s/#PermitRootLogin.*/PermitRootLogin\ yes/ /etc/ssh/sshd_config \
   && echo "root:root" | chpasswd \
@@ -12,26 +14,16 @@ RUN apk --update add --no-cache openssh bash \
   && sed -ir 's/#HostKey \/etc\/ssh\/ssh_host_ed25519_key/HostKey \/etc\/ssh\/ssh_host_ed25519_key/g' /etc/ssh/sshd_config \
   && /usr/bin/ssh-keygen -A \
   && ssh-keygen -t rsa -b 4096 -f  /etc/ssh/ssh_host_key
-# CMD ["/usr/sbin/sshd","-D"]
-# CMD [ "/usr/sbin/sshd", "-D"]
-# RUN yum install -y java-1.8.0-openjdk
-#RUN yum install -y tomcat
-#RUN yum install -y tomcat-webapps tomcat-admin-webapps tomcat-docs-webapp tomcat-javadoc
-#RUN mv /var/lib/tomcat/webapps/ROOT/ /var/lib/tomcat/webapps/default-ROOT-backup
-#COPY webapp /var/lib/tomcat/webapps/ROOT/
-#HEALTHCHECK --interval=5s --timeout=10s --retries=5 CMD curl -sS 127.0.0.1:8080 || exit 1
+
 RUN cd /usr/local/ \
   && wget http://apache.volia.net/tomcat/tomcat-8/v8.5.47/bin/apache-tomcat-8.5.47.tar.gz \
   && tar xzf apache-tomcat-8.5.47.tar.gz \
-  && pwd && ls -la \
   && mv apache-tomcat-8.5.47/ tomcat/ \
-  && pwd && ls -la \
-  && rm apache-tomcat-8.5.47.tar.gz \
-  && cd tomcat/bin/ \
-  && ./catalina.sh start \
-  && echo $?
-# CMD [ "/usr/local/tomcat/bin/catalina.sh", "start"]
-CMD [ "/usr/sbin/sshd", "-D"]
-# HEALTHCHECK --interval=5s --timeout=10s --retries=5 CMD curl -sS 127.0.0.1:8080 || exit 1
+  && rm apache-tomcat-8.5.47.tar.gz
+
+CMD [ "/usr/local/tomcat/bin/catalina.sh", "run"]
+
+HEALTHCHECK --interval=5s --timeout=10s --retries=5 CMD curl -sS 127.0.0.1:8080 || exit 1
+
 EXPOSE :8080
 EXPOSE :22
