@@ -21,6 +21,12 @@ RUN cd /usr/local/ \
   && mv apache-tomcat-8.5.47/ tomcat/ \
   && rm apache-tomcat-8.5.47.tar.gz
 
+RUN rm -rf /usr/local/tomcat/webapps/ROOT/
+
+COPY ROOT/ /usr/local/tomcat/webapps/ROOT
+ 
+RUN ls -la /usr/local/tomcat/webapps/
+
 CMD [ "/usr/local/tomcat/bin/catalina.sh", "run"]
 
 HEALTHCHECK --interval=5s --timeout=10s --retries=5 CMD curl -sS 127.0.0.1:8080 || exit 1
