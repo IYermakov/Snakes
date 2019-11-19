@@ -1,5 +1,7 @@
 FROM alpine
 
+LABEL maintainer="devopsa3"
+
 RUN apk add openjdk8
 
 RUN apk --update add --no-cache openssh bash \
