@@ -25,7 +25,7 @@ RUN cd /usr/local/ \
 
 RUN rm -rf /usr/local/tomcat/webapps/ROOT/
 
-COPY ROOT/ /usr/local/tomcat/webapps/ROOT
+COPY ROOT.war /usr/local/tomcat/webapps/
  
 RUN ls -la /usr/local/tomcat/webapps/
 
