@@ -69,6 +69,7 @@ pipeline {
             echo "======== Check Access ========="
             sh 'sleep 30'
             sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
+            currentBuild.result = 'SUCCESS'
           }
           catch (err) {
             currentBuild.result = 'FAILURE'
@@ -93,8 +94,8 @@ pipeline {
             sh '$(aws ecr get-login --no-include-email --region us-east-1)'
             docker.withRegistry("https://${ECRURI}") {
               dockerImage.push()
-            currentBuild.result = 'SUCCESS'
             }
+            currentBuild.result = 'SUCCESS'
           }
           catch (err) {
             currentBuild.result = 'FAILURE'
