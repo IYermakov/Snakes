@@ -17,7 +17,7 @@ pipeline {
     OPSRepoBranch = 'ecs-snakes'
     ImageTag = ""
 
-    if (env.TAG_NAME=NULL){
+    if (env.TAG_NAME == NULL){
       ImageTag = env.BUILD_NUMBER
     }else{
       ImageTag = env.TAG_NAME
