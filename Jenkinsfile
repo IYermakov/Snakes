@@ -15,6 +15,12 @@ pipeline {
     AppRepoName = 'snakes'
     OPSRepoURL = 'https://github.com/IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'ecs-snakes'
+    ImageTag = ""
+
+    if (env.TAG_NAME=NULL){
+      ImageTag = env.BUILD_NUMBER
+    }else{
+      ImageTag = env.TAG_NAME
 
   }
   stages {
@@ -26,8 +32,7 @@ pipeline {
     stage("Build Docker Image") {
       steps {
         script {
-          echo "${TAG_NAME}"
-          dockerImage = docker.build("${ECRURI}/${AppRepoName}:${TAG_NAME}")
+          dockerImage = docker.build("${ECRURI}/${AppRepoName}:${ImageTag}")
         }
       }
     }
@@ -77,7 +82,7 @@ pipeline {
       when { buildingTag() }
       steps {
         git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}")
-        sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${TAG_NAME} --region us-east-1"
+        sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${ImageTag} --region us-east-1"
       }
     }
   }
