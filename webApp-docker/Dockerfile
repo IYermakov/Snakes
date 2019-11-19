@@ -10,9 +10,13 @@ RUN cd /usr/local/ \
   && mv apache-tomcat-8.5.47/ tomcat/ \
   && rm apache-tomcat-8.5.47.tar.gz
 
-RUN rm -rf /usr/local/tomcat/webapps/ROOT/
+WORKDIR /home/project
 
-COPY ROOT.war /usr/local/tomcat/webapps/
+COPY . .
+
+RUN mv /usr/local/tomcat/webapps/ROOT/ /usr/local/tomcat/webapps/default-ROOT
+
+RUN cd eb-tomcat-snakes && ROOT.war /usr/local/tomcat/webapps/
  
 CMD [ "/usr/local/tomcat/bin/catalina.sh", "run"]
 
