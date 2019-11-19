@@ -87,13 +87,13 @@ pipeline {
             docker.withRegistry("https://${ECRURI}") {
               dockerImage.push()
             currentBuild.result = 'SUCCESS'
+            }
           }
           catch (err) {
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Delivery to ECR Failed, check logs.", subject: 'JOB FAILED', to: 'vecinomio@gmail.com'
           }
           echo "result is: ${currentBuild.currentResult}"
-          }
         }
       }
     }
@@ -119,7 +119,6 @@ pipeline {
             emailext body: "${err}. ECS Stack Creation Failed, check logs.", subject: 'JOB FAILED', to: 'vecinomio@gmail.com'
           }
           echo "result is: ${currentBuild.currentResult}"
-          }
         }
       }
     }
