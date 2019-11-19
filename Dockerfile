@@ -2,8 +2,8 @@ ARG app_name=ROOT
 
 FROM tomcat:8
 ARG app_name
-LABEL maintainer = "imaki" \
-      description = "tomcat-8 image with application about snakes"
+LABEL maintainer="devopsa3" \
+      description="tomcat-8 image with application about snakes"
 
 WORKDIR /home/project
 COPY . .

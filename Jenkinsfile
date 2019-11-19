@@ -64,8 +64,7 @@ pipeline {
     stage("Push artifact to ECR") {
       steps {
         script {
-          sh 'aws ecr get-authorization-token | eval "$(aws ecr get-login --no-include-email --region us-east-1)"'
-          // sh 'eval $(aws ecr get-login --no-include-email --region us-east-1)'
+          sh 'eval $(aws ecr get-login --no-include-email --region us-east-1)'
           docker.withRegistry("https://${ECRURI}") {
             dockerImage.push()
           }
@@ -75,7 +74,7 @@ pipeline {
     stage("CleanUp") {
       steps {
         echo "====================== Removing images ====================="
-        sh 'docker image prune -af'
+        sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
         sh 'docker images'
       }
     }
