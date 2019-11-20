@@ -50,7 +50,7 @@ pipeline {
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
-            sh "docker rmi ${dockerImage}"
+            sh "${DelUnusedImage}"
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Build Docker Image Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
             throw (err)
