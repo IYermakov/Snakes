@@ -60,8 +60,15 @@ pipeline {
     stage("Create Test Env") {
       steps {
         script {
+          try {
             echo "======== Start Docker Container ========"
             testContainer = dockerImage.run('-p 8090:8080 --name test')
+            currentBuild.result = 'SUCCESS'
+          catch (err) {
+            currentBuild.result = 'FAILURE'
+            emailext body: "${err}. Create Test Environment Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            throw (err)
+          }
         }
       }
     }
@@ -71,10 +78,11 @@ pipeline {
           try {
             echo "======== Check Access ========="
             sh 'sleep 30'
-            sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
+            sh 'curl -sS http://localhost:8090 | grep "Does it have snakes67676?"'
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
+            testContainer.stop()
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Curl Test Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
             throw (err)
