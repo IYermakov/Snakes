@@ -50,7 +50,7 @@ pipeline {
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
-            sh "${DelUnusedImage}"
+            sh "docker rmi ${dockerImage}"
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Build Docker Image Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
             throw (err)
@@ -69,7 +69,7 @@ pipeline {
           }
           catch (err) {
             testContainer.stop()
-            sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
+            sh "${DelUnusedImage}"
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Create Test Environment Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
             throw (err)
@@ -88,7 +88,7 @@ pipeline {
           }
           catch (err) {
             testContainer.stop()
-            sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
+            sh "${DelUnusedImage}"
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Curl Test Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
             throw (err)
@@ -116,7 +116,7 @@ pipeline {
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
-            sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
+            sh "${DelUnusedImage}"
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Delivery to ECR Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
             throw (err)
@@ -128,7 +128,7 @@ pipeline {
     stage("CleanUp") {
       steps {
         echo "====================== Removing images ====================="
-        sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
+        sh "${DelUnusedImage}"
         sh 'docker images'
       }
     }
