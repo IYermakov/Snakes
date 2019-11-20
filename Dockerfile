@@ -17,7 +17,7 @@ COPY . .
 
 RUN mv /usr/local/tomcat/webapps/ROOT/ /usr/local/tomcat/webapps/default-ROOT
 
-RUN cd eb-tomcat-snakes && ROOT.war /usr/local/tomcat/webapps/
+RUN cd eb-tomcat-snakes && cp ROOT.war /usr/local/tomcat/webapps/
 
 CMD [ "/usr/local/tomcat/bin/catalina.sh", "run"]
 
