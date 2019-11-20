@@ -71,7 +71,7 @@ pipeline {
           try {
             echo "======== Check Access ========="
             sh 'sleep 30'
-            sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
+            sh 'curl -sS http://localhost:8090 | grep "Does it have snakesHGHHJG?"'
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
