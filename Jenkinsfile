@@ -64,6 +64,7 @@ pipeline {
             echo "======== Start Docker Container ========"
             testContainer = dockerImage.run('-p 8090:8080 --name test')
             currentBuild.result = 'SUCCESS'
+          }
           catch (err) {
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Create Test Environment Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
