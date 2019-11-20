@@ -16,6 +16,7 @@ pipeline {
     OPSRepoURL = 'https://github.com/IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'ecs-snakes'
     ImageTag = ""
+    Email = 'vecinomio@gmail.com'
 
   }
   stages {
@@ -28,7 +29,7 @@ pipeline {
           }
           catch (err) {
             currentBuild.result = 'FAILURE'
-            emailext body: "${err}. Build Application Failed, check logs.", subject: 'JOB FAILED', to: 'vecinomio@gmail.com'
+            emailext body: "${err}. Build Application Failed, check logs.", subject: "JOB ${BUILD_NUMBER} FAILED", to: "${Email}"
             throw (err)
           }
           echo "result is: ${currentBuild.currentResult}"
@@ -49,7 +50,7 @@ pipeline {
           }
           catch (err) {
             currentBuild.result = 'FAILURE'
-            emailext body: "${err}. Build Docker Image Failed, check logs.", subject: 'JOB FAILED', to: 'vecinomio@gmail.com'
+            emailext body: "${err}. Build Docker Image Failed, check logs.", subject: "JOB ${BUILD_NUMBER} FAILED", to: "${Email}"
           }
           echo "result is: ${currentBuild.currentResult}"
         }
@@ -74,7 +75,7 @@ pipeline {
           }
           catch (err) {
             currentBuild.result = 'FAILURE'
-            emailext body: "${err}. Curl Test Failed, check logs.", subject: 'JOB FAILED', to: 'vecinomio@gmail.com'
+            emailext body: "${err}. Curl Test Failed, check logs.", subject: "JOB ${BUILD_NUMBER} FAILED", to: "${Email}"
           }
           echo "result is: ${currentBuild.currentResult}"
         }
@@ -100,7 +101,7 @@ pipeline {
           }
           catch (err) {
             currentBuild.result = 'FAILURE'
-            emailext body: "${err}. Delivery to ECR Failed, check logs.", subject: 'JOB FAILED', to: 'vecinomio@gmail.com'
+            emailext body: "${err}. Delivery to ECR Failed, check logs.", subject: "JOB ${BUILD_NUMBER} FAILED", to: "${Email}"
           }
           echo "result is: ${currentBuild.currentResult}"
         }
@@ -121,11 +122,11 @@ pipeline {
             git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}")
             sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${ImageTag} --region us-east-1"
             currentBuild.result = 'SUCCESS'
-            emailext body: 'Application was successfully deployed to ECS.', subject: 'CD finished', to: 'vecinomio@gmail.com'
+            emailext body: 'Application was successfully deployed to ECS.', subject: 'CD finished', to: "${Email}"
           }
           catch (err) {
             currentBuild.result = 'FAILURE'
-            emailext body: "${err}. ECS Stack Creation Failed, check logs.", subject: 'JOB FAILED', to: 'vecinomio@gmail.com'
+            emailext body: "${err}. ECS Stack Creation Failed, check logs.", subject: "JOB ${BUILD_NUMBER} FAILED", to: "${Email}"
           }
           echo "result is: ${currentBuild.currentResult}"
         }
