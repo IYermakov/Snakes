@@ -51,6 +51,7 @@ pipeline {
           catch (err) {
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Build Docker Image Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            throw (err)
           }
           echo "result is: ${currentBuild.currentResult}"
         }
@@ -76,6 +77,7 @@ pipeline {
           catch (err) {
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Curl Test Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            throw (err)
           }
           echo "result is: ${currentBuild.currentResult}"
         }
@@ -128,6 +130,7 @@ pipeline {
           catch (err) {
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. ECS Stack Creation Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            throw (err)
           }
           echo "result is: ${currentBuild.currentResult}"
         }
