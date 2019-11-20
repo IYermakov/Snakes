@@ -23,7 +23,7 @@ pipeline {
       steps {
         script {
           try {
-            sh 'cd eb0-tomcat-snakes && ./build.sh'
+            sh 'cd eb-tomcat-snakes && ./build.sh'
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
