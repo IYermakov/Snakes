@@ -102,6 +102,7 @@ pipeline {
           catch (err) {
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Delivery to ECR Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            throw (err)
           }
           echo "result is: ${currentBuild.currentResult}"
         }
