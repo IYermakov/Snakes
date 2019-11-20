@@ -114,6 +114,7 @@ pipeline {
               dockerImage.push()
             }
             currentBuild.result = 'SUCCESS'
+            emailext body: 'Docker Image was successfully delivered to ECR.', subject: "JOB with identifier ${Tag} SUCCESS", to: "${Email}"
           }
           catch (err) {
             sh "${DelUnusedImage}"
