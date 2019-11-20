@@ -5,7 +5,7 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
+
     <link href="css/bootstrap.css" rel="stylesheet" />
     <link href="css/snakes.css" rel="stylesheet" />
 
@@ -31,9 +31,9 @@
       <h1 class="cover-heading">Does it have snakes?</h1>
       <p class="lead">A safety resource for snake haters.</p>
       <!--Intro -->
-      <h2>Do you or a loved one hate snakes?</h2>
+      <h2>Do you or a loved one hate snakes? TEST</h2>
       <p>Snakes are a controversial topic. Some people love'em, some people just can't stand them. How do you get by in a world full of snakes?</p>
-      <h3 class="flyout toggle">Love snakes? <a href="#" onclick="switchto('love');return false;">Click Here</a></h3>
+      <h3 class="flyout toggle">Love snakes?, Are you crazy? <a href="#" onclick="switchto('love');return false;">Click Here</a></h3>
       <p>You wouldn't let a snake into your house, so why would you want one on your television screen? If you go out to see a movie, don't you want to know whether or not you can expect to be bombarded with images of awful snakes?</p>
       <div id="badsnake" parallax="true"></div>
       <!--Browse movies -->
