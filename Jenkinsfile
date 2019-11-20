@@ -29,7 +29,7 @@ pipeline {
           catch (err) {
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Build Application Failed, check logs.", subject: 'JOB FAILED', to: 'vecinomio@gmail.com'
-            continuePipeline = false
+            throw (err)
           }
           echo "result is: ${currentBuild.currentResult}"
         }
