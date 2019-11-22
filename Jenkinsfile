@@ -126,7 +126,7 @@ pipeline {
           }
           catch (err) {
             sh "${DelUnusedImage}"
-            sh "pwd && rm -rf ${OPSRepoBranch}"
+            // sh "pwd && rm -rf ${OPSRepoBranch}"
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Tagging Stage Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
             throw (err)
