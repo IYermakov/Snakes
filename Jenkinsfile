@@ -118,7 +118,7 @@ pipeline {
             sh "rm -rf ${OPSRepoBranch}"
             sh "mkdir -p ${OPSRepoBranch}"
             dir("${OPSRepoBranch}") {
-              git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}", credentialsID: "devopsa3")
+              git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}", credentialsId: "devopsa3")
               sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
               sh "git push origin ${Tag} && cd .."
             }
