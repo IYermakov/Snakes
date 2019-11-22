@@ -115,7 +115,8 @@ pipeline {
           try {
             sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
             sh "git push origin ${Tag}"
-            sh "mkdir ${OPSRepoBranch}"
+            sh "rm -rf ${OPSRepoBranch}"
+            sh "mkdir -p ${OPSRepoBranch}"
             dir("${OPSRepoBranch}") {
               git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}", credentialSID: "devopsa3")
               sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
@@ -125,6 +126,7 @@ pipeline {
           }
           catch (err) {
             sh "${DelUnusedImage}"
+            sh "pwd && rm -rf ${OPSRepoBranch}"
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Tagging Stage Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
             throw (err)
