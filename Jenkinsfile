@@ -24,7 +24,7 @@ pipeline {
     stage("Condition") {
       steps {
         script {
-          if (env.BRANCH_NAME == 'master') {
+          if (env.BRANCH_NAME == 'master-test') {
             Tag = "release-${Tag}"
           } else {
             Tag = "${BRANCH_NAME}-${Tag}"
@@ -145,7 +145,7 @@ pipeline {
       }
     }
     stage("Create stack") {
-      when { branch 'master' }
+      when { branch 'master-test' }
       steps {
         script {
           try {
