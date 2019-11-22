@@ -119,8 +119,10 @@ pipeline {
             sh "mkdir -p ${OPSRepoBranch}"
             dir("${OPSRepoBranch}") {
               git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}", credentialsId: "devopsa3")
-              sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
-              sh "git push origin ${Tag} && cd .."
+              sshagent (credentials: ['devopsa3']) {
+                sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
+                sh "git push origin ${Tag} && cd .."
+              }
             }
             currentBuild.result = 'SUCCESS'
           }
