@@ -13,8 +13,9 @@ pipeline {
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
     AppRepoName = 'snakes'
-    OPSRepoURL = 'https://github.com/IYermakov/DevOpsA3Training.git'
+    OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'ecs-spot'
+
     Tag = "1.0.${BUILD_NUMBER}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
@@ -116,7 +117,7 @@ pipeline {
             sh "git push origin ${Tag}"
             sh "mkdir ${OPSRepoBranch}"
             dir("${OPSRepoBranch}") {
-              git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}")
+              git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}", credentialSID: "devopsa3")
               sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
               sh "git push origin ${Tag} && cd .."
             }
