@@ -114,10 +114,10 @@ pipeline {
           try {
             sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
             sh "git push origin ${Tag}"
-            sh "mkdir ops && cd ops"
+            sh "mkdir ${OPSRepoBranch} && cd ${OPSRepoBranch}"
             git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}")
             sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
-            sh "git push origin ${Tag} && cd .." 
+            sh "git push origin ${Tag} && cd .."
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
