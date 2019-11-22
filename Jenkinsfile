@@ -15,7 +15,7 @@ pipeline {
     AppRepoName = 'snakes'
     OPSRepoURL = 'https://github.com/IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'ecs-spot'
-    Tag = "1.0.0"
+    Tag = "1.0.${BUILD_NUMBER}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
@@ -115,8 +115,20 @@ pipeline {
     }
     stage("Tagging") {
       steps {
-        sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
-        sh "git push origin ${Tag}"
+        script {
+          try {
+            sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
+            sh "git push origin ${Tag}"
+            currentBuild.result = 'SUCCESS'
+          }
+          catch (err) {
+            sh "${DelUnusedImage}"
+            currentBuild.result = 'FAILURE'
+            emailext body: "${err}. Tagging Stage Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            throw (err)
+          }
+          echo "result is: ${currentBuild.currentResult}"
+        }
       }
     }
     stage("CleanUp") {
