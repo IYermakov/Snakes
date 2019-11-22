@@ -14,21 +14,31 @@ pipeline {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
     AppRepoName = 'snakes'
     OPSRepoURL = 'https://github.com/IYermakov/DevOpsA3Training.git'
-    OPSRepoBranch = 'ecs-snakes'
-    Tag = ""
+    OPSRepoBranch = 'ecs-spot'
+    Tag = "1.0.0"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
-
   }
   stages {
+    stage("Condition") {
+      steps {
+        script {
+          if (env.BRANCH_NAME == 'master') {
+            Tag = "release-${Tag}"
+          } else {
+            Tag = "${BRANCH_NAME}-${Tag}"
+          }
+        }
+      }
+    }
     stage("Build app") {
       steps {
         script {
-          if (env.TAG_NAME) {
-            Tag = env.TAG_NAME
-          } else {
-            Tag = env.BUILD_NUMBER
-          }
+          // if (env.TAG_NAME) {
+          //   Tag = env.TAG_NAME
+          // } else {
+          //   Tag = env.BUILD_NUMBER
+          // }
           try {
             sh 'cd eb-tomcat-snakes && ./build.sh'
             currentBuild.result = 'SUCCESS'
@@ -59,49 +69,26 @@ pipeline {
         }
       }
     }
-    stage("Create Test Env") {
+    stage("Test") {
       steps {
         script {
           try {
             echo "======== Start Docker Container ========"
             testContainer = dockerImage.run('-p 8090:8080 --name test')
-            currentBuild.result = 'SUCCESS'
-          }
-          catch (err) {
-            testContainer.stop()
-            sh "${DelUnusedImage}"
-            currentBuild.result = 'FAILURE'
-            emailext body: "${err}. Create Test Environment Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
-            throw (err)
-          }
-        }
-      }
-    }
-    stage("Test") {
-      steps {
-        script {
-          try {
             echo "======== Check Access ========="
             sh 'sleep 30'
             sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
+            echo "======== Disable and Remove Container ========="
+            testContainer.stop()
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
             testContainer.stop()
             sh "${DelUnusedImage}"
             currentBuild.result = 'FAILURE'
-            emailext body: "${err}. Curl Test Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            emailext body: "${err}. Test Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
             throw (err)
           }
-          echo "result is: ${currentBuild.currentResult}"
-        }
-      }
-    }
-    stage("Remove Test Env") {
-      steps {
-        script {
-          echo "======== Disable and Remove Container ========="
-          testContainer.stop()
         }
       }
     }
@@ -124,6 +111,12 @@ pipeline {
           }
           echo "result is: ${currentBuild.currentResult}"
         }
+      }
+    }
+    stage("Tagging") {
+      steps {
+        sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
+        sh "git push origin ${Tag}"
       }
     }
     stage("CleanUp") {
