@@ -121,14 +121,14 @@ pipeline {
               git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}", credentialsId: "devopsa3")
               sshagent (credentials: ['devopsa3']) {
                 sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
-                sh "git push origin ${Tag} && cd .."
+                sh "git push origin ${Tag}"
               }
             }
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
             sh "${DelUnusedImage}"
-            // sh "pwd && rm -rf ${OPSRepoBranch}"
+            sh "pwd && rm -rf ${OPSRepoBranch}"
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Tagging Stage Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
             throw (err)
@@ -145,12 +145,13 @@ pipeline {
       }
     }
     stage("Create stack") {
-      when { buildingTag() }
+      when { branch 'master' }
       steps {
         script {
           try {
-            git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}")
-            sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} --region us-east-1"
+            dir("${OPSRepoBranch}") {
+              sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} --region us-east-1"
+            }
             currentBuild.result = 'SUCCESS'
             emailext body: 'Application was successfully deployed to ECS.', subject: "JOB with identifier ${Tag} SUCCESS", to: "${Email}"
           }
