@@ -34,11 +34,6 @@ pipeline {
     stage("Build app") {
       steps {
         script {
-          // if (env.TAG_NAME) {
-          //   Tag = env.TAG_NAME
-          // } else {
-          //   Tag = env.BUILD_NUMBER
-          // }
           try {
             sh 'cd eb-tomcat-snakes && ./build.sh'
             currentBuild.result = 'SUCCESS'
@@ -119,6 +114,10 @@ pipeline {
           try {
             sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
             sh "git push origin ${Tag}"
+            sh "mkdir ops && cd ops"
+            git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}")
+            sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
+            sh "git push origin ${Tag} && cd .." 
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
