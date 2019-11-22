@@ -13,22 +13,28 @@ pipeline {
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
     AppRepoName = 'snakes'
-    OPSRepoURL = 'https://github.com/IYermakov/DevOpsA3Training.git'
-    OPSRepoBranch = 'ecs-snakes'
-    Tag = ""
+    OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
+    OPSRepoBranch = 'ecs-spot'
+
+    Tag = "1.0.${BUILD_NUMBER}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
-
   }
   stages {
+    stage("Condition") {
+      steps {
+        script {
+          if (env.BRANCH_NAME == 'master') {
+            Tag = "release-${Tag}"
+          } else {
+            Tag = "${BRANCH_NAME}-${Tag}"
+          }
+        }
+      }
+    }
     stage("Build app") {
       steps {
         script {
-          if (env.TAG_NAME) {
-            Tag = env.TAG_NAME
-          } else {
-            Tag = env.BUILD_NUMBER
-          }
           try {
             sh 'cd eb-tomcat-snakes && ./build.sh'
             currentBuild.result = 'SUCCESS'
@@ -59,49 +65,26 @@ pipeline {
         }
       }
     }
-    stage("Create Test Env") {
+    stage("Test") {
       steps {
         script {
           try {
             echo "======== Start Docker Container ========"
             testContainer = dockerImage.run('-p 8090:8080 --name test')
-            currentBuild.result = 'SUCCESS'
-          }
-          catch (err) {
-            testContainer.stop()
-            sh "${DelUnusedImage}"
-            currentBuild.result = 'FAILURE'
-            emailext body: "${err}. Create Test Environment Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
-            throw (err)
-          }
-        }
-      }
-    }
-    stage("Test") {
-      steps {
-        script {
-          try {
             echo "======== Check Access ========="
             sh 'sleep 30'
             sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
+            echo "======== Disable and Remove Container ========="
+            testContainer.stop()
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
             testContainer.stop()
             sh "${DelUnusedImage}"
             currentBuild.result = 'FAILURE'
-            emailext body: "${err}. Curl Test Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            emailext body: "${err}. Test Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
             throw (err)
           }
-          echo "result is: ${currentBuild.currentResult}"
-        }
-      }
-    }
-    stage("Remove Test Env") {
-      steps {
-        script {
-          echo "======== Disable and Remove Container ========="
-          testContainer.stop()
         }
       }
     }
@@ -126,6 +109,34 @@ pipeline {
         }
       }
     }
+    stage("Tagging") {
+      steps {
+        script {
+          try {
+            sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
+            sh "git push origin ${Tag}"
+            sh "rm -rf ${OPSRepoBranch}"
+            sh "mkdir -p ${OPSRepoBranch}"
+            dir("${OPSRepoBranch}") {
+              git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}", credentialsId: "devopsa3")
+              sshagent (credentials: ['devopsa3']) {
+                sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
+                sh "git push origin ${Tag}"
+              }
+            }
+            currentBuild.result = 'SUCCESS'
+          }
+          catch (err) {
+            sh "${DelUnusedImage}"
+            sh "pwd && rm -rf ${OPSRepoBranch}"
+            currentBuild.result = 'FAILURE'
+            emailext body: "${err}. Tagging Stage Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            throw (err)
+          }
+          echo "result is: ${currentBuild.currentResult}"
+        }
+      }
+    }
     stage("CleanUp") {
       steps {
         echo "====================== Removing images ====================="
@@ -134,12 +145,13 @@ pipeline {
       }
     }
     stage("Create stack") {
-      when { buildingTag() }
+      when { branch 'master' }
       steps {
         script {
           try {
-            git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}")
-            sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} --region us-east-1"
+            dir("${OPSRepoBranch}") {
+              sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} --region us-east-1"
+            }
             currentBuild.result = 'SUCCESS'
             emailext body: 'Application was successfully deployed to ECS.', subject: "JOB with identifier ${Tag} SUCCESS", to: "${Email}"
           }
