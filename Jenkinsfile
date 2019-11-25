@@ -6,6 +6,9 @@ pipeline {
   agent {
     label 'master'
   }
+  parameters {
+    string(defaultValue: '1.2.0', description: 'A version of Release', name: 'RELEASE_VERSION')
+  }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
     timestamps()
@@ -16,7 +19,7 @@ pipeline {
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'ecs-spot'
 
-    Tag = "1.0.${BUILD_NUMBER}"
+    Tag = "${params.RELEASE_VERSION}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
