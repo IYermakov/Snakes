@@ -6,12 +6,12 @@ pipeline {
   agent {
     label 'master'
   }
-  parameters {
-    string(defaultValue: '1.2.0', description: 'A version of Release', name: 'RELEASE_VERSION')
-  }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
     timestamps()
+  }
+  parameters {
+    string(defaultValue: '1.0.0', description: 'A version of Release', name: 'RELEASE_VERSION')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -24,6 +24,14 @@ pipeline {
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
   stages {
+    stage('checkout') {
+      steps {
+        checkout([$class: 'GitSCM', branches: [[name: tagVersion]],
+                  userRemoteConfigs: [[url: 'git@github.com:IYermakov/Snakes.git',
+                                       credentialsId: 'snakes']]
+                ])
+      }
+    }
     stage("Condition") {
       steps {
         script {
