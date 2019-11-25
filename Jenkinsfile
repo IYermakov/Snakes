@@ -24,14 +24,14 @@ pipeline {
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
   stages {
-    stage('checkout') {
-      steps {
-        checkout([$class: 'GitSCM', branches: [[name: tagVersion]],
-                  userRemoteConfigs: [[url: 'git@github.com:IYermakov/Snakes.git',
-                                       credentialsId: 'snakes']]
-                ])
-      }
-    }
+    // stage('checkout') {
+    //   steps {
+    //     checkout([$class: 'GitSCM', branches: [[name: tagVersion]],
+    //               userRemoteConfigs: [[url: 'git@github.com:IYermakov/Snakes.git',
+    //                                    credentialsId: 'snakes']]
+    //             ])
+    //   }
+    // }
     stage("Condition") {
       steps {
         script {
