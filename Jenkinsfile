@@ -12,14 +12,14 @@ pipeline {
   }
   parameters {
     string(defaultValue: '1.0.0', description: 'A version of Release', name: 'VERSION')
-    string(defaultValue: 'Build app', description: 'bla', name: 'Stage2')
+    booleanParam(name: 'Stage1', defaultValue: true, description: 'Do Stage1 or not')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'ecs-spot'
-    Stage2 = "${params.Stage2}"
+    Stage1 = "${params.Stage1}"
     Tag = "${params.VERSION}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
@@ -37,7 +37,7 @@ pipeline {
       }
     }
     stage("Build app") {
-      when { environment name: 'Stage2', value: 'Build app' }
+      when { environment name: 'Stage1', value: 'true' }
       steps {
         script {
           try {
@@ -77,7 +77,7 @@ pipeline {
             echo "======== Start Docker Container ========"
             testContainer = dockerImage.run('-p 8090:8080 --name test')
             echo "======== Check Access ========="
-            sh 'sleep 30'
+            sh 'sleep 10'
             sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
             echo "======== Disable and Remove Container ========="
             testContainer.stop()
