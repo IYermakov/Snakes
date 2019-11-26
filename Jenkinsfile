@@ -11,7 +11,7 @@ pipeline {
     timestamps()
   }
   parameters {
-    string(defaultValue: '1.0.0', description: 'A version of Release', name: 'VERSION')
+    string(defaultValue: '0.0.0', description: 'A version of Release', name: 'VERSION')
     booleanParam(name: 'BuildApp', defaultValue: true, description: '')
     booleanParam(name: 'Test', defaultValue: true, description: '')
     booleanParam(name: 'Delivery', defaultValue: false, description: '')
@@ -36,10 +36,10 @@ pipeline {
     stage("Condition") {
       steps {
         script {
-          if (env.BRANCH_NAME == 'master-test') {
-            Tag = "release-${Tag}"
+          if (Delivery == 'true') {
+            Tag = "rc-${Tag}"
           } else {
-            Tag = "${BRANCH_NAME}-${Tag}"
+            Tag = "${BRANCH_NAME}-${BUILD_NUMBER}"
           }
         }
       }
