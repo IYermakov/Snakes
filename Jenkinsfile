@@ -95,7 +95,7 @@ pipeline {
         }
       }
     }
-    stage("Test") {
+    stage("MyStep") {
       when { environment name: 'CHOICE', value: 'One' }
       steps {
         script {
