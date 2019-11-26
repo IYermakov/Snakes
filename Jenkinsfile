@@ -27,7 +27,7 @@ pipeline {
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'ecs-spot'
 
-    Tag = "${params.AV_RELEASE_VERSION}"
+    Tag = "${params.RELEASE_VERSION}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
@@ -99,7 +99,8 @@ pipeline {
       steps {
         script {
           sh 'echo ${RELEASE_VERSION} ${TAG}'
-          sh 'git tag | sort -V | tail -1'
+          sh 'export LAST_GIT_TAG = "$(git tag | sort -V | tail -1)"'
+          sh 'echo LAST_GIT_TAG = "$(LAST_GIT_TAG)"'
         }
       }
     }
