@@ -100,7 +100,8 @@ pipeline {
         script {
           sh 'echo ${RELEASE_VERSION} ${TAG}'
           sh 'export LAST_GIT_TAG="$(git tag | sort -V | tail -1)"'
-          sh 'echo LAST_GIT_TAG = $LAST_GIT_TAG'
+          sh 'echo Find env variable'
+          sh 'echo LAST_GIT_TAG = "$LAST_GIT_TAG"'
         }
       }
     }
