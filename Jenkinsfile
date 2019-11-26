@@ -12,14 +12,24 @@ pipeline {
   }
   parameters {
     string(defaultValue: '1.0.0', description: 'A version of Release', name: 'VERSION')
-    booleanParam(name: 'Stage1', defaultValue: true, description: 'Do Stage1 or not')
+    booleanParam(name: 'BuildApp', defaultValue: true, description: 'To do or not')
+    booleanParam(name: 'BuildDockerImage', defaultValue: true, description: 'To do or not')
+    booleanParam(name: 'Test', defaultValue: true, description: 'To do or not')
+    booleanParam(name: 'Delivery', defaultValue: false, description: 'To do or not')
+    booleanParam(name: 'Tagging', defaultValue: false, description: 'To do or not')
+    booleanParam(name: 'Deployment', defaultValue: false, description: 'To do or not')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'ecs-spot'
-    Stage1 = "${params.Stage1}"
+    BuildApp = "${params.BuildApp}"
+    BuildDockerImage = "${params.BuildDockerImage}"
+    Test = "${params.Test}"
+    Delivery = "${params.Test}"
+    Tagging = "${params.Test}"
+    Deployment = "${params.Test}"
     Tag = "${params.VERSION}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
@@ -37,7 +47,7 @@ pipeline {
       }
     }
     stage("Build app") {
-      when { environment name: 'Stage1', value: 'true' }
+      when { environment name: 'BuildApp', value: 'true' }
       steps {
         script {
           try {
@@ -54,6 +64,7 @@ pipeline {
       }
     }
     stage("Build Docker Image") {
+      when { environment name: 'BuildDockerImage', value: 'true' }
       steps {
         script {
           try {
@@ -71,6 +82,7 @@ pipeline {
       }
     }
     stage("Test") {
+      when { environment name: 'Test', value: 'true' }
       steps {
         script {
           try {
@@ -93,55 +105,57 @@ pipeline {
         }
       }
     }
-    // stage("Push artifact to ECR") {
-    //   steps {
-    //     script {
-    //       try {
-    //         sh '$(aws ecr get-login --no-include-email --region us-east-1)'
-    //         docker.withRegistry("https://${ECRURI}") {
-    //           dockerImage.push()
-    //         }
-    //         currentBuild.result = 'SUCCESS'
-    //         emailext body: 'Docker Image was successfully delivered to ECR.', subject: "JOB with identifier ${Tag} SUCCESS", to: "${Email}"
-    //       }
-    //       catch (err) {
-    //         sh "${DelUnusedImage}"
-    //         currentBuild.result = 'FAILURE'
-    //         emailext body: "${err}. Delivery to ECR Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
-    //         throw (err)
-    //       }
-    //       echo "result is: ${currentBuild.currentResult}"
-    //     }
-    //   }
-    // }
-    // stage("Tagging") {
-    //   steps {
-    //     script {
-    //       try {
-    //         sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
-    //         sh "git push origin ${Tag}"
-    //         sh "rm -rf ${OPSRepoBranch}"
-    //         sh "mkdir -p ${OPSRepoBranch}"
-    //         dir("${OPSRepoBranch}") {
-    //           git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}", credentialsId: "devopsa3")
-    //           sshagent (credentials: ['devopsa3']) {
-    //             sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
-    //             sh "git push origin ${Tag}"
-    //           }
-    //         }
-    //         currentBuild.result = 'SUCCESS'
-    //       }
-    //       catch (err) {
-    //         sh "${DelUnusedImage}"
-    //         sh "pwd && rm -rf ${OPSRepoBranch}"
-    //         currentBuild.result = 'FAILURE'
-    //         emailext body: "${err}. Tagging Stage Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
-    //         throw (err)
-    //       }
-    //       echo "result is: ${currentBuild.currentResult}"
-    //     }
-    //   }
-    // }
+    stage("Push artifact to ECR") {
+      when { environment name: 'Delivery', value: 'true' }
+      steps {
+        script {
+          try {
+            sh '$(aws ecr get-login --no-include-email --region us-east-1)'
+            docker.withRegistry("https://${ECRURI}") {
+              dockerImage.push()
+            }
+            currentBuild.result = 'SUCCESS'
+            emailext body: 'Docker Image was successfully delivered to ECR.', subject: "JOB with identifier ${Tag} SUCCESS", to: "${Email}"
+          }
+          catch (err) {
+            sh "${DelUnusedImage}"
+            currentBuild.result = 'FAILURE'
+            emailext body: "${err}. Delivery to ECR Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            throw (err)
+          }
+          echo "result is: ${currentBuild.currentResult}"
+        }
+      }
+    }
+    stage("Tagging") {
+      when { environment name: 'Tagging', value: 'true' }
+      steps {
+        script {
+          try {
+            sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
+            sh "git push origin ${Tag}"
+            sh "rm -rf ${OPSRepoBranch}"
+            sh "mkdir -p ${OPSRepoBranch}"
+            dir("${OPSRepoBranch}") {
+              git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}", credentialsId: "devopsa3")
+              sshagent (credentials: ['devopsa3']) {
+                sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
+                sh "git push origin ${Tag}"
+              }
+            }
+            currentBuild.result = 'SUCCESS'
+          }
+          catch (err) {
+            sh "${DelUnusedImage}"
+            sh "pwd && rm -rf ${OPSRepoBranch}"
+            currentBuild.result = 'FAILURE'
+            emailext body: "${err}. Tagging Stage Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            throw (err)
+          }
+          echo "result is: ${currentBuild.currentResult}"
+        }
+      }
+    }
     stage("CleanUp") {
       steps {
         echo "====================== Removing images ====================="
@@ -150,7 +164,7 @@ pipeline {
       }
     }
     stage("Create stack") {
-      when { branch 'master-test' }
+      when { environment name: 'Deployment', value: 'true' }
       steps {
         script {
           try {
