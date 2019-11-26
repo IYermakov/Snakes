@@ -19,7 +19,7 @@ pipeline {
     string(defaultValue: '1.0.0', description: 'TAG a Release version', name: 'RELEASE_VERSION')
     booleanParam(name: 'Push to ECR', defaultValue: false, description: 'Push docker image to ECR')
     booleanParam(name: 'Deploy ECS stack', defaultValue: false, description: 'Deploy ECS stack')
-    choice(name: 'CHOICE', choices: ['One', 'Two', 'Three', (booleanParam(name: 'Lets Try', defaultValue: true, description: 'TryIt'))], description: 'Pick something')
+    choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
     password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'A secret password')
   }
   environment {
@@ -35,6 +35,7 @@ pipeline {
 
   stages{
     stage("Build app") {
+      when { environment name: 'Build application', value: 'true' }
       steps {
         script {
           try {
@@ -52,6 +53,7 @@ pipeline {
       }
     }
     stage("Build Docker Image") {
+      when { environment name: 'Build Docker Image', value: 'true' }
       steps {
         script {
           try {
@@ -70,6 +72,7 @@ pipeline {
       }
     }
     stage("Test") {
+      when { environment name: 'Test', value: 'true' }
       steps {
         script {
           try {
@@ -92,6 +95,13 @@ pipeline {
         }
       }
     }
-
+    stage("Test") {
+      when { environment name: 'CHOICE', value: 'One' }
+      steps {
+        script {
+          sh 'echo ${RELEASE_VERSION} ${TAG}'
+        }
+      }
+    }
   }
 }
