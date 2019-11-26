@@ -99,7 +99,7 @@ pipeline {
       steps {
         script {
           sh 'echo ${RELEASE_VERSION} ${TAG}'
-          sh 'export LAST_GIT_TAG = "$(git tag | sort -V | tail -1)"'
+          sh 'export LAST_GIT_TAG="$(git tag | sort -V | tail -1)"'
           sh 'echo LAST_GIT_TAG = "$(LAST_GIT_TAG)"'
         }
       }
