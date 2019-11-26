@@ -13,6 +13,9 @@ pipeline {
   parameters {
     string(defaultValue: '1.0.0', description: 'A version of Release', name: 'RELEASE_VERSION')
     string(defaultValue: '1.0.0', description: 'A version of Release', name: 'AV_RELEASE_VERSION')
+    booleanParam(name: 'Build application', defaultValue: true, description: 'Build Java web application')
+    booleanParam(name: 'Build Docker Image', defaultValue: true, description: 'Build Docker Image with Java web application')
+    booleanParam(name: 'Test', defaultValue: true, description: 'Test Docker Image with Java web application')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -32,6 +35,7 @@ pipeline {
           try {
             sh 'cd eb-tomcat-snakes && ./build.sh'
             currentBuild.result = 'SUCCESS'
+            sh 'echo ${AV_RELEASE_VERSION}'
           }
           catch (err) {
             currentBuild.result = 'FAILURE'
