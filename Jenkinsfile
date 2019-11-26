@@ -11,11 +11,14 @@ pipeline {
     timestamps()
   }
   parameters {
-    string(defaultValue: '1.0.0', description: 'A version of Release', name: 'RELEASE_VERSION')
-    string(defaultValue: '1.0.0', description: 'A version of Release', name: 'AV_RELEASE_VERSION')
+
     booleanParam(name: 'Build application', defaultValue: true, description: 'Build Java web application')
     booleanParam(name: 'Build Docker Image', defaultValue: true, description: 'Build Docker Image with Java web application')
     booleanParam(name: 'Test', defaultValue: true, description: 'Test Docker Image with Java web application')
+    booleanParam(name: 'TAG', defaultValue: false, description: 'TAG git commit and docker image')
+    string(defaultValue: '1.0.0', description: 'TAG a Release version', name: 'RELEASE_VERSION')
+    booleanParam(name: 'Push to ECR', defaultValue: false, description: 'Push docker image to ECR')
+    booleanParam(name: 'Deploy ECS stack', defaultValue: false, description: 'Deploy ECS stack')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
