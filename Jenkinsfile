@@ -12,12 +12,12 @@ pipeline {
   }
   parameters {
     string(defaultValue: '1.0.0', description: 'A version of Release', name: 'VERSION')
-    booleanParam(name: 'BuildApp', defaultValue: true, description: 'To do or not')
-    booleanParam(name: 'BuildDockerImage', defaultValue: true, description: 'To do or not')
-    booleanParam(name: 'Test', defaultValue: true, description: 'To do or not')
-    booleanParam(name: 'Delivery', defaultValue: false, description: 'To do or not')
-    booleanParam(name: 'Tagging', defaultValue: false, description: 'To do or not')
-    booleanParam(name: 'Deployment', defaultValue: false, description: 'To do or not')
+    // booleanParam(name: 'BuildApp', defaultValue: true, description: '')
+    booleanParam(name: 'Build', defaultValue: true, description: '')
+    booleanParam(name: 'Test', defaultValue: true, description: '')
+    booleanParam(name: 'Delivery', defaultValue: false, description: '')
+    booleanParam(name: 'Tagging', defaultValue: false, description: '')
+    booleanParam(name: 'Deployment', defaultValue: false, description: '')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -25,7 +25,7 @@ pipeline {
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'ecs-spot'
     BuildApp = "${params.BuildApp}"
-    BuildDockerImage = "${params.BuildDockerImage}"
+    Build = "${params.Build}"
     Test = "${params.Test}"
     Delivery = "${params.Delivery}"
     Tagging = "${params.Tagging}"
@@ -47,7 +47,7 @@ pipeline {
       }
     }
     stage("Build app") {
-      when { environment name: 'BuildApp', value: 'true' }
+      when { environment name: 'Build', value: 'true' }
       steps {
         script {
           try {
@@ -64,7 +64,7 @@ pipeline {
       }
     }
     stage("Build Docker Image") {
-      when { environment name: 'BuildDockerImage', value: 'true' }
+      when { environment name: 'Build', value: 'true' }
       steps {
         script {
           try {
