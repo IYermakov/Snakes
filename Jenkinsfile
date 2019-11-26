@@ -12,8 +12,7 @@ pipeline {
   }
   parameters {
     string(defaultValue: '1.0.0', description: 'A version of Release', name: 'VERSION')
-    // booleanParam(name: 'BuildApp', defaultValue: true, description: '')
-    booleanParam(name: 'Build', defaultValue: true, description: '')
+    booleanParam(name: 'BuildApp', defaultValue: true, description: '')
     booleanParam(name: 'Test', defaultValue: true, description: '')
     booleanParam(name: 'Delivery', defaultValue: false, description: '')
     booleanParam(name: 'Tagging', defaultValue: false, description: '')
@@ -25,7 +24,6 @@ pipeline {
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'ecs-spot'
     BuildApp = "${params.BuildApp}"
-    Build = "${params.Build}"
     Test = "${params.Test}"
     Delivery = "${params.Delivery}"
     Tagging = "${params.Tagging}"
@@ -47,7 +45,7 @@ pipeline {
       }
     }
     stage("Build app") {
-      when { environment name: 'Build', value: 'true' }
+      when { environment name: 'BuildApp', value: 'true' }
       steps {
         script {
           try {
@@ -64,7 +62,7 @@ pipeline {
       }
     }
     stage("Build Docker Image") {
-      when { environment name: 'Build', value: 'true' }
+      when { environment name: 'BuildApp', value: 'true' }
       steps {
         script {
           try {
