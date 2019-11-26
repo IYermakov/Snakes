@@ -19,6 +19,8 @@ pipeline {
     string(defaultValue: '1.0.0', description: 'TAG a Release version', name: 'RELEASE_VERSION')
     booleanParam(name: 'Push to ECR', defaultValue: false, description: 'Push docker image to ECR')
     booleanParam(name: 'Deploy ECS stack', defaultValue: false, description: 'Deploy ECS stack')
+    choice(name: 'CHOICE', choices: ['One', 'Two', 'Three', (booleanParam(name: 'Lets Try', defaultValue: true, description: 'TryIt'))], description: 'Pick something')
+    password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'A secret password')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
