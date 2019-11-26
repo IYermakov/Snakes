@@ -102,6 +102,7 @@ pipeline {
           sh 'export LAST_GIT_TAG="$(git tag | sort -V | tail -1)"'
           sh 'echo Find env variable'
           sh 'echo LAST_GIT_TAG = "$LAST_GIT_TAG"'
+          sh ('printenv | sort')
         }
       }
     }
