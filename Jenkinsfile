@@ -20,7 +20,6 @@ pipeline {
     booleanParam(name: 'Push to ECR', defaultValue: false, description: 'Push docker image to ECR')
     booleanParam(name: 'Deploy ECS stack', defaultValue: false, description: 'Deploy ECS stack')
     choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
-    password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'A secret password')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -96,10 +95,11 @@ pipeline {
       }
     }
     stage("MyStep") {
-      when { environment name: 'CHOICE', value: 'One' }
+      when { environment name: 'RELEASE_VERSION', value: '1.0.0' }
       steps {
         script {
           sh 'echo ${RELEASE_VERSION} ${TAG}'
+          sh 'git tag | sort -V | tail -1'
         }
       }
     }
