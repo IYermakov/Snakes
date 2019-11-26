@@ -27,9 +27,9 @@ pipeline {
     BuildApp = "${params.BuildApp}"
     BuildDockerImage = "${params.BuildDockerImage}"
     Test = "${params.Test}"
-    Delivery = "${params.Test}"
-    Tagging = "${params.Test}"
-    Deployment = "${params.Test}"
+    Delivery = "${params.Delivery}"
+    Tagging = "${params.Tagging}"
+    Deployment = "${params.Deployment}"
     Tag = "${params.VERSION}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
