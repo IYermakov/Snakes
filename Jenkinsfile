@@ -24,18 +24,8 @@ pipeline {
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
-  stages {
-    stage("Condition") {
-      steps {
-        script {
-          if ( ${BRANCH_NAME} == 'master-test') {
-            Tag = "release-${Tag}"
-          } else {
-            Tag = "${BRANCH_NAME}-${Tag}"
-          }
-        }
-      }
-    }
+
+  stages{
     stage("Build app") {
       steps {
         script {
