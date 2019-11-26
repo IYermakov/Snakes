@@ -12,7 +12,7 @@ pipeline {
   }
   parameters {
 
-    booleanParam(name: 'Build application', defaultValue: true, description: 'Build Java web application')
+    booleanParam(name: 'Build application', defaultValue: true, description: 'Build Java   web application')
     booleanParam(name: 'Build Docker Image', defaultValue: true, description: 'Build Docker Image with Java web application')
     booleanParam(name: 'Test', defaultValue: true, description: 'Test Docker Image with Java web application')
     booleanParam(name: 'TAG', defaultValue: false, description: 'TAG git commit and docker image')
