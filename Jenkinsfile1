@@ -38,7 +38,7 @@ pipeline {
     stage("Condition") {
       steps {
         script {
-          if (Delivery == 'true') {
+          if (CD == 'true') {
             Tag = "rc-${Tag}"
           } else {
             Tag = "${BRANCH_NAME}-${BUILD_NUMBER}"
