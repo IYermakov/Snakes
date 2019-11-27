@@ -111,7 +111,7 @@ pipeline {
       }
       steps {
         echo 'Deploying --IncreaseMiddleVersion'
-        echo "New Middle version candidate is $((nextVersionB ++))"
+        let 'nextVersionB++'
         echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
@@ -122,7 +122,7 @@ pipeline {
       }
       steps {
         echo 'Deploying --IncreaseMajorVersion'
-        echo "New Major version candidate is $((nextVersionC ++))"
+        let 'nextVersionC++'
         echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
