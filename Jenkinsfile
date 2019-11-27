@@ -100,7 +100,7 @@ pipeline {
       }
       steps {
         echo 'Deploying --IncreaseMinorVersion'
-        echo "we will tag '${nextVersionA}'.'${nextVersionB}'.'$((${nextVersionC} ++))'"
+        echo "New Minor version candidate is $((nextVersionA ++))"
         echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
@@ -111,7 +111,7 @@ pipeline {
       }
       steps {
         echo 'Deploying --IncreaseMiddleVersion'
-        echo "we will tag '${nextVersionA}'.'$((${nextVersionB} ++))'.'${nextVersionC}'"
+        echo "New Middle version candidate is $((nextVersionB ++))"
         echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
@@ -122,7 +122,7 @@ pipeline {
       }
       steps {
         echo 'Deploying --IncreaseMajorVersion'
-        echo "we will tag '$((${nextVersionA} ++))'.'${nextVersionB}'.'${nextVersionC}'"
+        echo "New Major version candidate is $((nextVersionC ++))"
         echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
