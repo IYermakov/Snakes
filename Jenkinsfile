@@ -82,6 +82,7 @@ pipeline {
       steps {
         echo 'Deploying --SaveOldVersion'
       }
+    }
 
 
     stage("Build app") {
