@@ -13,8 +13,8 @@ pipeline {
   parameters {
 
     booleanParam(name: 'Build application', defaultValue: true, description: 'Build Java   web application')
-    booleanParam(name: 'Build Docker Image', defaultValue: true, description: 'Build Docker Image with Java web application')
-    booleanParam(name: 'Test', defaultValue: true, description: 'Test Docker Image with Java web application')
+    booleanParam(name: 'Build Docker Image', defaultValue: false, description: 'Build Docker Image with Java web application')
+    booleanParam(name: 'Test', defaultValue: false, description: 'Test Docker Image with Java web application')
     booleanParam(name: 'TAG', defaultValue: false, description: 'TAG git commit and docker image')
     string(defaultValue: '1.0.0', description: 'TAG a Release version', name: 'RELEASE_VERSION')
     booleanParam(name: 'Push to ECR', defaultValue: false, description: 'Push docker image to ECR')
@@ -30,9 +30,16 @@ pipeline {
     Tag = "${params.RELEASE_VERSION}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
+    String result=’0.0.0';
   }
 
   stages{
+    stage(‘preparation’){
+      steps {
+         echo “Build Preparation”
+         checkout scm
+      }
+    }
     stage("Build app") {
       when { environment name: 'Build application', value: 'true' }
       steps {
