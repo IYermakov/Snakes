@@ -50,9 +50,9 @@ pipeline {
             B=\$(echo \$version | cut -d '.' -f 2)
             C=\$(echo \$version | cut -d '.' -f 3)
             echo A= \$A, B=\$B, C=\$C
-            echo "[\$A]" > outFileA
-            echo "[\$B]" > outFileB
-            echo "[\$C]" > outFileC
+            echo "[\$((A ++))]" > outFileA
+            echo "[\$((B ++))]" > outFileB
+            echo "[\$((C ++))]" > outFileC
             if [ \$C -gt 8 ]
                 then
                     if [ \$B -gt 8 ]
@@ -100,7 +100,7 @@ pipeline {
       }
       steps {
         echo 'Deploying --IncreaseMinorVersion'
-        let 'nextVersionA++'
+
         echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
@@ -111,7 +111,7 @@ pipeline {
       }
       steps {
         echo 'Deploying --IncreaseMiddleVersion'
-        let 'nextVersionB++'
+
         echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
@@ -122,7 +122,7 @@ pipeline {
       }
       steps {
         echo 'Deploying --IncreaseMajorVersion'
-        let 'nextVersionC++'
+
         echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
