@@ -36,7 +36,7 @@ pipeline {
   stages{
     stage(‘preparation’){
       steps {
-         echo “Build Preparation”
+         sh 'echo Build Preparation'
          checkout scm
       }
     }
