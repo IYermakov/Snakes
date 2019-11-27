@@ -49,6 +49,12 @@ pipeline {
             A=\$(echo \$version | cut -d '.' -f 1)
             B=\$(echo \$version | cut -d '.' -f 2)
             C=\$(echo \$version | cut -d '.' -f 3)
+            echo "[\$A]" > outFileA
+            echo "[\$B]" > outFileB
+            echo "[\$C]" > outFileC
+            incrA=\$A
+            incrB=\$B
+            incrC=\$C
             echo A= \$A, B=\$B, C=\$C
 
             if [ \$C -gt 8 ]
@@ -67,18 +73,21 @@ pipeline {
             echo "[\$A.\$B.\$C]" > outFile
             echo Try to read outFile
             cat outFile
-            let A++
-            let B++
-            let C++
-            echo "[\$A]" > outFileA
-            echo "[\$B]" > outFileB
-            echo "[\$C]" > outFileC
-            echo Increased: A= \$A, B=\$B, C=\$C
+            let incrA++
+            let incrB++
+            let incrC++
+            echo "[\$incrA]" > outFileAincr
+            echo "[\$incrB]" > outFileBincr
+            echo "[\$incrC]" > outFileCincr
+            echo Increased: A=\$incrA, B=\$incrB, C=\$incrC
             '''
             nextVersion = readFile 'outFile'
-            nextVersionA = readFile 'outFileA'
-            nextVersionB = readFile 'outFileB'
-            nextVersionC = readFile 'outFileC'
+            nextVersionA = readFile 'outFileAincr'
+            nextVersionB = readFile 'outFileBincr'
+            nextVersionC = readFile 'outFileCincr'
+            curVersionA = readFile 'outFileA'
+            curVersionB = readFile 'outFileB'
+            curVersionC = readFile 'outFileC'
             echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
             echo "we will tag '${nextVersion}'"
             result = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
@@ -94,8 +103,8 @@ pipeline {
       }
       steps {
         echo 'Deploying --SaveOldVersion'
-        echo "we will not tag '${nextVersionA}'.'${nextVersionB}'.'${nextVersionC}'"
-        echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
+        echo "we will Current version '${curVersionA}'.'${curVersionB}'.'${curVersionC}'"
+
       }
     }
 
@@ -106,7 +115,7 @@ pipeline {
       steps {
         echo 'Deploying --IncreaseMinorVersion'
 
-        echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
+        echo "we will update Minor version  A='${curVersionA}'  B='${curVersionB}'  C='${nextVersionC}'  "
       }
     }
 
@@ -117,7 +126,7 @@ pipeline {
       steps {
         echo 'Deploying --IncreaseMiddleVersion'
 
-        echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
+        echo "we will update Middle version  A='${curVersionA}'  B='${nextVersionB}'  C='${curVersionC}'  "
       }
     }
 
@@ -128,7 +137,7 @@ pipeline {
       steps {
         echo 'Deploying --IncreaseMajorVersion'
 
-        echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
+        echo "we will update Major version  A='${nextVersionA}'  B='${curVersionB}'  C='${curVersionC}'  "
       }
     }
 
