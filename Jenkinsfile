@@ -50,7 +50,7 @@ pipeline {
             A="\$(echo \$version|cut -d '.' -f1)"
             B="\$(echo \$version|cut -d '.' -f2)"
             C="\$(echo \$version|cut -d '.' -f3)"
-            echo A= ${A}, B=${B}, C=${C}
+            # echo A= ${A}, B=${B}, C=${C}
             if [ \$C -gt 8 ]
                 then
                     if [ \$B -gt 8 ]
@@ -64,7 +64,7 @@ pipeline {
             else
                 C=\$((C+1))
             fi
-            echo "A[\$A.\$B.\$C]">outFile """
+            echo "A[\$A.\$B.\$C]" > outFile """
             nextVersion = readFile 'outFile'
             echo "we will tag '${nextVersion}'"
             result =nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
