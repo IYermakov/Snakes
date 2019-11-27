@@ -18,7 +18,7 @@ pipeline {
     booleanParam(name: 'TAG', defaultValue: false, description: 'TAG git commit and docker image')
     booleanParam(name: 'Push to ECR', defaultValue: false, description: 'Push docker image to ECR')
     booleanParam(name: 'Deploy ECS stack', defaultValue: false, description: 'Deploy ECS stack')
-    choice(name: 'Tagging', choices: ['Save     OLD version', 'Increase Minor  version', 'Increase Middle version', 'Increase Major  version'], description: 'Pick Version Tag')
+    choice(name: 'Tagging', choices: ['Save OLD version', 'Increase Minor  version', 'Increase Middle version', 'Increase Major  version'], description: 'Pick Version Tag')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -75,12 +75,44 @@ pipeline {
         }
       }
     }
+
     stage("Choice --SaveOldVersion"){
       when {
-        equals expected: "Save     OLD version", actual: params.Tagging
+        equals expected: "Save OLD version", actual: params.Tagging
       }
       steps {
         echo 'Deploying --SaveOldVersion'
+        echo "we will not tag '${result}'"
+      }
+    }
+
+    stage("Choice --IncreaseMinorVersion"){
+      when {
+        equals expected: "Increase Minor  version", actual: params.Tagging
+      }
+      steps {
+        echo 'Deploying --IncreaseMinorVersion'
+        echo "we will tag '${result}'"
+      }
+    }
+
+    stage("Choice --IncreaseMiddleVersion"){
+      when {
+        equals expected: "Increase Middle version", actual: params.Tagging
+      }
+      steps {
+        echo 'Deploying --IncreaseMiddleVersion'
+        echo "we will tag '${result}'"
+      }
+    }
+
+    stage("Choice --IncreaseMajorVersion"){
+      when {
+        equals expected: "Increase Major  version", actual: params.Tagging
+      }
+      steps {
+        echo 'Deploying --IncreaseMajorVersion'
+        echo "we will tag '${result}'"
       }
     }
 
