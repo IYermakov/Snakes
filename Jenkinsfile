@@ -44,7 +44,7 @@ pipeline {
     stage("Auto tagging"){
       steps {
         script {
-            sh """
+            sh "”"
             version=\$(git describe --tags `git rev-list --tags --max-count=1`)
             # Version to get the latest tag
             A="\$(echo \$version|cut -d '.' -f1)"
@@ -64,7 +64,7 @@ pipeline {
             else
                 C=\$((C+1))
             fi
-            echo "A[\$A.\$B.\$C]" > outFile """
+            echo "A[\$A.\$B.\$C]" > outFile "”"
             nextVersion = readFile 'outFile'
             echo "we will tag '${nextVersion}'"
             result =nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
