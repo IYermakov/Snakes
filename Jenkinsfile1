@@ -133,7 +133,7 @@ pipeline {
         script {
           build job: 'CD',
             parameters: [
-              string(name: 'passed_Tag', value: "${Tag}"
+              string(name: 'passed_Tag', value: "${Tag}")
             ]
         }
       }
