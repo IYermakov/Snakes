@@ -100,7 +100,7 @@ pipeline {
       }
       steps {
         echo 'Deploying --IncreaseMinorVersion'
-        echo "New Minor version candidate is $((nextVersionA ++))"
+        let 'nextVersionA++'
         echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
