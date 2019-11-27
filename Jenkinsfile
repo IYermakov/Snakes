@@ -16,10 +16,9 @@ pipeline {
     booleanParam(name: 'Build Docker Image', defaultValue: false, description: 'Build Docker Image with Java web application')
     booleanParam(name: 'Test', defaultValue: false, description: 'Test Docker Image with Java web application')
     booleanParam(name: 'TAG', defaultValue: false, description: 'TAG git commit and docker image')
-    string(defaultValue: readFile 'outFile', description: 'TAG a Release version', name: 'RELEASE_VERSION')
     booleanParam(name: 'Push to ECR', defaultValue: false, description: 'Push docker image to ECR')
     booleanParam(name: 'Deploy ECS stack', defaultValue: false, description: 'Deploy ECS stack')
-    choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
+    choice(name: 'CHOICE', choices: ['Save OLD version', 'Increase Minor version', 'Increase Middle version', 'Increase Major version'], description: 'Pick Version Tag')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -70,7 +69,7 @@ pipeline {
             '''
             nextVersion = readFile 'outFile'
             echo "we will tag '${nextVersion}'"
-            result =nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
+            result = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
             echo "we will tag '${result}'"
         }
       }
