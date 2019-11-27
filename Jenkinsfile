@@ -30,7 +30,7 @@ pipeline {
     Tag = "${params.RELEASE_VERSION}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
-    String result=’0.0.0';
+    String result='0.0.0';
   }
 
   stages{
