@@ -18,7 +18,7 @@ pipeline {
     booleanParam(name: 'TAG', defaultValue: false, description: 'TAG git commit and docker image')
     booleanParam(name: 'Push to ECR', defaultValue: false, description: 'Push docker image to ECR')
     booleanParam(name: 'Deploy ECS stack', defaultValue: false, description: 'Deploy ECS stack')
-    choice(name: 'CHOICE', choices: ['Save OLD version', 'Increase Minor version', 'Increase Middle version', 'Increase Major version'], description: 'Pick Version Tag')
+    choice(name: 'Tagging', choices: ['Save     OLD version', 'Increase Minor  version', 'Increase Middle version', 'Increase Major  version'], description: 'Pick Version Tag')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -71,6 +71,7 @@ pipeline {
             echo "we will tag '${nextVersion}'"
             result = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
             echo "we will tag '${result}'"
+            echo "Choice: ${params.Tagging}"
         }
       }
     }
