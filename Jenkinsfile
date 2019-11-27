@@ -40,7 +40,7 @@ pipeline {
       }
     }
 
-    stage("Auto tagging"){
+    stage("Parsing of version A.B.C"){
       steps {
         script {
             sh ''' echo "Executing Tagging"
@@ -50,6 +50,9 @@ pipeline {
             B=\$(echo \$version | cut -d '.' -f 2)
             C=\$(echo \$version | cut -d '.' -f 3)
             echo A= \$A, B=\$B, C=\$C
+            echo "[\$A]" > outFileA
+            echo "[\$B]" > outFileB
+            echo "[\$C]" > outFileC
             if [ \$C -gt 8 ]
                 then
                     if [ \$B -gt 8 ]
@@ -68,6 +71,10 @@ pipeline {
             cat outFile
             '''
             nextVersion = readFile 'outFile'
+            nextVersionA = readFile 'outFileA'
+            nextVersionB = readFile 'outFileB'
+            nextVersionC = readFile 'outFileC'
+            echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
             echo "we will tag '${nextVersion}'"
             result = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
             echo "we will tag '${result}'"
@@ -83,6 +90,7 @@ pipeline {
       steps {
         echo 'Deploying --SaveOldVersion'
         echo "we will not tag '${result}'"
+        echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
 
@@ -93,6 +101,7 @@ pipeline {
       steps {
         echo 'Deploying --IncreaseMinorVersion'
         echo "we will tag '${result}'"
+        echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
 
@@ -103,6 +112,7 @@ pipeline {
       steps {
         echo 'Deploying --IncreaseMiddleVersion'
         echo "we will tag '${result}'"
+        echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
 
@@ -113,6 +123,7 @@ pipeline {
       steps {
         echo 'Deploying --IncreaseMajorVersion'
         echo "we will tag '${result}'"
+        echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
 
