@@ -16,7 +16,7 @@ pipeline {
     booleanParam(name: 'Test', defaultValue: true, description: '')
     booleanParam(name: 'Delivery', defaultValue: false, description: '')
     // booleanParam(name: 'Tagging', defaultValue: false, description: '')
-    booleanParam(name: 'Tag-Deploy', defaultValue: false, description: '')
+    booleanParam(name: 'Tag-Deployment', defaultValue: false, description: '')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -26,7 +26,7 @@ pipeline {
     BuildApp = "${params.BuildApp}"
     Test = "${params.Test}"
     Delivery = "${params.Delivery}"
-    Tag-Deploy = "${params.Tag-Deploy}"
+    Tag-Deployment = "${params.Tag-Deployment}"
     // Tagging = "${params.Tagging}"
     Tag = "${params.VERSION}"
     Email = 'vecinomio@gmail.com'
@@ -126,7 +126,7 @@ pipeline {
       }
     }
     stage("Tag and Deploy") {
-      when { environment name: 'Tag-Deploy', value: 'true' }
+      when { environment name: 'Tag-Deployment', value: 'true' }
       steps {
         script {
           build job: 'docker-pipe-2',
