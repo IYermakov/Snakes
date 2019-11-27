@@ -64,7 +64,9 @@ pipeline {
             else
                 C=\$((C+1))
             fi
-            echo `A[\$A.\$B.\$C]` > outFile
+            echo "[\$A.\$B.\$C]" > outFile
+            echo Try to read outFile
+            cat outFile
             '''
             nextVersion = readFile 'outFile'
             echo "we will tag '${nextVersion}'"
