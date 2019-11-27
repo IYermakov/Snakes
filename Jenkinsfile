@@ -16,7 +16,7 @@ pipeline {
     booleanParam(name: 'Build Docker Image', defaultValue: false, description: 'Build Docker Image with Java web application')
     booleanParam(name: 'Test', defaultValue: false, description: 'Test Docker Image with Java web application')
     booleanParam(name: 'TAG', defaultValue: false, description: 'TAG git commit and docker image')
-    string(defaultValue: '${result}', description: 'TAG a Release version', name: 'RELEASE_VERSION')
+    string(defaultValue: readFile 'outFile', description: 'TAG a Release version', name: 'RELEASE_VERSION')
     booleanParam(name: 'Push to ECR', defaultValue: false, description: 'Push docker image to ECR')
     booleanParam(name: 'Deploy ECS stack', defaultValue: false, description: 'Deploy ECS stack')
     choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
