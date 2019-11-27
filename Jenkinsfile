@@ -47,9 +47,9 @@ pipeline {
             sh ''' echo "Executing Tagging"
             version=\$(git describe --tags `git rev-list --tags --max-count=1`)
             # Version to get the latest tag
-            A=`\$(echo \$version | cut -d '.' -f 1)`
-            B=`\$(echo \$version | cut -d '.' -f 2)`
-            C=`\$(echo \$version | cut -d '.' -f 3)`
+            A=\$(echo \$version | cut -d '.' -f 1)
+            B=\$(echo \$version | cut -d '.' -f 2)
+            C=\$(echo \$version | cut -d '.' -f 3)
             echo A= \$A, B=\$B, C=\$C
             if [ \$C -gt 8 ]
                 then
