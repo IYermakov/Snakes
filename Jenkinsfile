@@ -42,6 +42,7 @@ pipeline {
 
     stage("Auto tagging"){
       steps {
+       step{
         script {
             sh ''' echo "Executing Tagging"
             version=\$(git describe --tags `git rev-list --tags --max-count=1`)
@@ -73,6 +74,7 @@ pipeline {
             echo "we will tag '${result}'"
             echo "Choice: ${params.Tagging}"
         }
+       }
       }
     }
 
