@@ -16,7 +16,7 @@ pipeline {
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'ecs-spot'
-    Tag = "2.0.${BUILD_NUMBER}"
+    Tag = "${params.passed_Tag}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }

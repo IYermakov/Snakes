@@ -131,7 +131,10 @@ pipeline {
       when { environment name: 'CD', value: 'true' }
       steps {
         script {
-          build job: 'CD'
+          build job: 'CD',
+            parameters: [
+              string(name: 'passed_Tag', value: "${Tag}"
+            ]
         }
       }
     }
