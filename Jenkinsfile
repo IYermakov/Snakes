@@ -66,7 +66,7 @@ pipeline {
             echo "A[\$A.\$B.\$C]">outFile """
             nextVersion = readFile 'outFile'
             echo "we will tag '${nextVersion}'"
-            result =nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]");
+            result =nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
             echo "we will tag '${result}'"
         }
       }
