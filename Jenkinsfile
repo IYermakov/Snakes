@@ -89,7 +89,7 @@ pipeline {
       }
       steps {
         echo 'Deploying --SaveOldVersion'
-        echo "we will not tag '${result}'"
+        echo "we will not tag '${nextVersionA}'.'${nextVersionB}'.'${nextVersionC}'"
         echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
@@ -100,7 +100,7 @@ pipeline {
       }
       steps {
         echo 'Deploying --IncreaseMinorVersion'
-        echo "we will tag '${result}'"
+        echo "we will tag '${nextVersionA}'.'${nextVersionB}'.'$((${nextVersionC} ++))'"
         echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
@@ -111,7 +111,7 @@ pipeline {
       }
       steps {
         echo 'Deploying --IncreaseMiddleVersion'
-        echo "we will tag '${result}'"
+        echo "we will tag '${nextVersionA}'.'$((${nextVersionB} ++))'.'${nextVersionC}'"
         echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
@@ -122,7 +122,7 @@ pipeline {
       }
       steps {
         echo 'Deploying --IncreaseMajorVersion'
-        echo "we will tag '${result}'"
+        echo "we will tag '$((${nextVersionA} ++))'.'${nextVersionB}'.'${nextVersionC}'"
         echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
       }
     }
