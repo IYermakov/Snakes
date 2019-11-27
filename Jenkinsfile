@@ -130,8 +130,12 @@ pipeline {
       steps {
         script {
           try {
-            sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
-            sh "git push origin ${Tag}"
+            sshagent (credentials: ['snakes']) {
+              sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
+              sh "git push origin ${Tag}"
+            }
+            // sh "git tag -a ${Tag} -m 'Added tag ${Tag}'"
+            // sh "git push origin ${Tag}"
             sh "rm -rf ${OPSRepoBranch}"
             sh "mkdir -p ${OPSRepoBranch}"
             dir("${OPSRepoBranch}") {
