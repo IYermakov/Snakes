@@ -50,9 +50,7 @@ pipeline {
             B=\$(echo \$version | cut -d '.' -f 2)
             C=\$(echo \$version | cut -d '.' -f 3)
             echo A= \$A, B=\$B, C=\$C
-            echo "[\$((A ++))]" > outFileA
-            echo "[\$((B ++))]" > outFileB
-            echo "[\$((C ++))]" > outFileC
+
             if [ \$C -gt 8 ]
                 then
                     if [ \$B -gt 8 ]
@@ -69,6 +67,13 @@ pipeline {
             echo "[\$A.\$B.\$C]" > outFile
             echo Try to read outFile
             cat outFile
+            let A++
+            let B++
+            let C++
+            echo "[\$A]" > outFileA
+            echo "[\$B]" > outFileB
+            echo "[\$C]" > outFileC
+            echo Increased: A= \$A, B=\$B, C=\$C
             '''
             nextVersion = readFile 'outFile'
             nextVersionA = readFile 'outFileA'
