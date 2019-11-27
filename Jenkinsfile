@@ -77,7 +77,7 @@ pipeline {
     }
     stage("Choice --SaveOldVersion"){
       when {
-        equals expected: "Save     OLD version", actual: ${params.Tagging}
+        equals expected: "Save     OLD version", actual: params.Tagging
       }
       steps {
         echo 'Deploying --SaveOldVersion'
