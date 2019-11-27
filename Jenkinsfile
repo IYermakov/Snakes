@@ -73,13 +73,15 @@ pipeline {
             echo "we will tag '${result}'"
             echo "Choice: ${params.Tagging}"
         }
- //      when { equals expected: 2, actual: currentBuild.number }
-      }
-      steps {
-        echo 'Deploying'
       }
     }
-
+    stage("Choice --SaveOldVersion"){
+      when {
+        equals expected: "Save     OLD version", actual: ${params.Tagging}
+      }
+      steps {
+        echo 'Deploying --SaveOldVersion'
+      }
 
 
     stage("Build app") {
