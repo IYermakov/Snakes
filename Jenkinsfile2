@@ -49,13 +49,6 @@ pipeline {
         }
       }
     }
-    // stage("CleanUp") {
-    //   steps {
-    //     echo "====================== Removing images ====================="
-    //     sh "${DelUnusedImage}"
-    //     sh 'docker images'
-    //   }
-    // }
     // stage("Create stack") {
     //   steps {
     //     script {

@@ -15,9 +15,8 @@ pipeline {
     booleanParam(name: 'BuildApp', defaultValue: true, description: '')
     booleanParam(name: 'Test', defaultValue: true, description: '')
     booleanParam(name: 'Delivery', defaultValue: false, description: '')
-    booleanParam(name: 'CD', defaultValue: false, description: '')
     // booleanParam(name: 'Tagging', defaultValue: false, description: '')
-    // booleanParam(name: 'Deployment', defaultValue: false, description: '')
+    booleanParam(name: 'Tag-Deploy', defaultValue: false, description: '')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -27,9 +26,8 @@ pipeline {
     BuildApp = "${params.BuildApp}"
     Test = "${params.Test}"
     Delivery = "${params.Delivery}"
-    CD = "${params.CD}"
+    Tag-Deploy = "${params.Tag-Deploy}"
     // Tagging = "${params.Tagging}"
-    // Deployment = "${params.Deployment}"
     Tag = "${params.VERSION}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
@@ -127,11 +125,11 @@ pipeline {
         }
       }
     }
-    stage("Trigger CD") {
-      when { environment name: 'CD', value: 'true' }
+    stage("Tag and Deploy") {
+      when { environment name: 'Tag-Deploy', value: 'true' }
       steps {
         script {
-          build job: 'CD',
+          build job: 'docker-pipe-2',
             parameters: [
               string(name: 'passed_Tag', value: "${Tag}")
             ]
@@ -167,13 +165,13 @@ pipeline {
     //     }
     //   }
     // }
-    // stage("CleanUp") {
-    //   steps {
-    //     echo "====================== Removing images ====================="
-    //     sh "${DelUnusedImage}"
-    //     sh 'docker images'
-    //   }
-    // }
+    stage("CleanUp") {
+      steps {
+        echo "====================== Removing images ====================="
+        sh "${DelUnusedImage}"
+        sh 'docker images'
+      }
+    }
     // stage("Create stack") {
     //   when { environment name: 'Deployment', value: 'true' }
     //   steps {
