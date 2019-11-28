@@ -92,13 +92,13 @@ pipeline {
             echo "[\$A.\$B.\$C]" > outFile
             echo Try to read outFile
             cat outFile
-            let incrA++
-            let incrB++
-            let incrC++
-            echo "[\$incrA]" > outFileAincr
-            echo "[\$incrB]" > outFileBincr
-            echo "[\$incrC]" > outFileCincr
-            echo Increased: A=\$incrA, B=\$incrB, C=\$incrC
+            # let incrA++
+            # let incrB++
+            # let incrC++
+            # echo "[\$incrA]" > outFileAincr
+            # echo "[\$incrB]" > outFileBincr
+            # echo "[\$incrC]" > outFileCincr
+            echo Increased: A=\$A, B=\$B, C=\$C
             '''
             nextVersion = readFile 'outFile'
             nextVersionA = readFile 'outFileAincr'
