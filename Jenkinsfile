@@ -47,16 +47,17 @@ pipeline {
             sh ''' echo "Executing Tagging"
             version=\$(git describe --tags `git rev-list --tags --max-count=1`)
             # Version to get the latest tag
-            Aprefix=\$(echo \$version | cut -d '.' -f 1)
-            A=\$(echo \$Aprefix | cut -d '-' -f 2)
+            FirstSet=\$(echo \$version | cut -d '.' -f 1)
+            Prefix=\$(echo \$FirstSet | cut -d '-' -f 1)
+            A=\$(echo \$FirstSet | cut -d '-' -f 2)
             B=\$(echo \$version | cut -d '.' -f 2)
             C=\$(echo \$version | cut -d '.' -f 3)
-            echo "[\$A]" > outFileA
-            echo "[\$B]" > outFileB
-            echo "[\$C]" > outFileC
-            incrA=\$A
-            incrB=\$B
-            incrC=\$C
+            # echo "[\$A]" > outFileA
+            # echo "[\$B]" > outFileB
+            # echo "[\$C]" > outFileC
+            # incrA=\$A
+            # incrB=\$B
+            # incrC=\$C
             echo " *** ORIGIN VERSION A= \$A, B=\$B, C=\$C *** "
 
             # if [ \$C -gt 8 ]
@@ -93,8 +94,8 @@ pipeline {
             fi
 
             echo "[\$A.\$B.\$C]" > outFile
-            echo Try to read outFile
-            cat outFile
+            # echo Try to read outFile
+            # cat outFile
             # let incrA++
             # let incrB++
             # let incrC++
@@ -104,65 +105,20 @@ pipeline {
             echo Increased: A=\$A, B=\$B, C=\$C
             '''
             nextVersion = readFile 'outFile'
-            nextVersionA = readFile 'outFileAincr'
-            nextVersionB = readFile 'outFileBincr'
-            nextVersionC = readFile 'outFileCincr'
-            curVersionA = readFile 'outFileA'
-            curVersionB = readFile 'outFileB'
-            curVersionC = readFile 'outFileC'
-            echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
+            // nextVersionA = readFile 'outFileAincr'
+            //nextVersionB = readFile 'outFileBincr'
+            //nextVersionC = readFile 'outFileCincr'
+            //curVersionA = readFile 'outFileA'
+            //curVersionB = readFile 'outFileB'
+            //curVersionC = readFile 'outFileC'
+            //echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
             echo "we will tag '${nextVersion}'"
             result = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
             echo "we will tag '${result}'"
-            echo "Choice: ${params.Tagging}"
+            // echo "Choice: ${params.Tagging}"
         }
       }
     }
-
-    stage("Choice --SaveOldVersion"){
-      when {
-        equals expected: "SaveOLD", actual: ChoiceResult
-      }
-      steps {
-        echo 'Deploying --SaveOldVersion'
-        echo "we will Current version '${curVersionA}'.'${curVersionB}'.'${curVersionC}'"
-
-      }
-    }
-
-    stage("Choice --IncreaseMinorVersion"){
-      when {
-        equals expected: "Minor", actual: ChoiceResult
-      }
-      steps {
-        echo 'Deploying --IncreaseMinorVersion'
-
-        echo "we will update Minor version  A='${curVersionA}'  B='${curVersionB}'  C='${nextVersionC}'  "
-      }
-    }
-
-    stage("Choice --IncreaseMiddleVersion"){
-      when {
-        equals expected: "Middle", actual: ChoiceResult
-      }
-      steps {
-        echo 'Deploying --IncreaseMiddleVersion'
-
-        echo "we will update Middle version  A='${curVersionA}'  B='${nextVersionB}'  C='${curVersionC}'  "
-      }
-    }
-
-    stage("Choice --IncreaseMajorVersion"){
-      when {
-        equals expected: "Major", actual: ChoiceResult
-      }
-      steps {
-        echo 'Deploying --IncreaseMajorVersion'
-
-        echo "we will update Major version  A='${nextVersionA}'  B='${curVersionB}'  C='${curVersionC}'  "
-      }
-    }
-
 
     stage("Build app") {
       when { environment name: 'Build application', value: 'true' }
