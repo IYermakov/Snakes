@@ -47,7 +47,7 @@ pipeline {
             sh ''' echo "Executing Tagging"
             version=\$(git describe --tags `git rev-list --tags --max-count=1`)
             FirstSet=\$(echo \$version | cut -d '.' -f 1)
-            if [ \$#FirstSet -ge 2 ];
+            if [ \${#FirstSet} -ge 2 ];
                 then
                     Prefix=\$(echo \$FirstSet | cut -d '-' -f 1)
                     A=\$(echo \$FirstSet | cut -d '-' -f 2)
