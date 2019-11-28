@@ -46,34 +46,18 @@ pipeline {
         script {
             sh ''' echo "Executing Tagging"
             version=\$(git describe --tags `git rev-list --tags --max-count=1`)
-            # Version to get the latest tag
             FirstSet=\$(echo \$version | cut -d '.' -f 1)
-            Prefix=\$(echo \$FirstSet | cut -d '-' -f 1)
-            A=\$(echo \$FirstSet | cut -d '-' -f 2)
+            if [ \$FirstSet -ge 2 ];
+                then
+                    Prefix=\$(echo \$FirstSet | cut -d '-' -f 1)
+                    A=\$(echo \$FirstSet | cut -d '-' -f 2)
+                else
+                    Prefix=""
+                    A=\$FirstSet
+            fi
             B=\$(echo \$version | cut -d '.' -f 2)
             C=\$(echo \$version | cut -d '.' -f 3)
-            # echo "[\$A]" > outFileA
-            # echo "[\$B]" > outFileB
-            # echo "[\$C]" > outFileC
-            # incrA=\$A
-            # incrB=\$B
-            # incrC=\$C
             echo " *** ORIGIN VERSION A= \$A, B=\$B, C=\$C *** "
-
-            # if [ \$C -gt 8 ]
-            #    then
-            #        if [ \$B -gt 8 ]
-            #            then
-            #                A=\$((A+1))
-            #                B=0 C=0
-            #        else
-            #            B=\$((B+1))
-            #            C=0
-            #        fi
-            # else
-            #    C=\$((C+1))
-            # fi
-
             if [ ${ChoiceResult} == "Minor" ]
                 then
                     C=\$((C+1))
@@ -92,30 +76,12 @@ pipeline {
                     C=0
                     echo "Executing Major"
             fi
-
             echo "[\$Prefix-\$A.\$B.\$C]" > outFile
-            # echo Try to read outFile
-            # cat outFile
-            # let incrA++
-            # let incrB++
-            # let incrC++
-            # echo "[\$incrA]" > outFileAincr
-            # echo "[\$incrB]" > outFileBincr
-            # echo "[\$incrC]" > outFileCincr
             echo Increased: A=\$A, B=\$B, C=\$C
             '''
             nextVersion = readFile 'outFile'
-            // nextVersionA = readFile 'outFileAincr'
-            //nextVersionB = readFile 'outFileBincr'
-            //nextVersionC = readFile 'outFileCincr'
-            //curVersionA = readFile 'outFileA'
-            //curVersionB = readFile 'outFileB'
-            //curVersionC = readFile 'outFileC'
-            //echo "Current version is A='${nextVersionA}'  B='${nextVersionB}'  C='${nextVersionC}'  "
-            echo "we will tag '${nextVersion}'"
             result = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
-            echo "we will tag '${result}'"
-            // echo "Choice: ${params.Tagging}"
+            echo "We will --tag '${result}'"
         }
       }
     }
@@ -178,18 +144,6 @@ pipeline {
             emailext body: "${err}. Test Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
             throw (err)
           }
-        }
-      }
-    }
-    stage("MyStep") {
-      when { environment name: 'RELEASE_VERSION', value: '1.0.0' }
-      steps {
-        script {
-          sh 'echo ${RELEASE_VERSION} ${TAG}'
-          sh 'export LAST_GIT_TAG="$(git tag | sort -V | tail -1)"'
-          sh 'echo Find env variable'
-          sh 'echo LAST_GIT_TAG = "$LAST_GIT_TAG"'
-          sh ('printenv | sort')
         }
       }
     }
