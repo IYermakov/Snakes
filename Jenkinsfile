@@ -80,6 +80,11 @@ pipeline {
             nextVersion = readFile 'outFile'
             result = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
             echo "We will --tag '${result}'"
+
+            // Set new Tag
+            sh "git status"
+            sh "git tag -a ${result} -m 'Added tag ${result}'"
+            sh "git push origin ${result}"
         }
       }
     }
