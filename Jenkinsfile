@@ -73,20 +73,23 @@ pipeline {
             #    C=\$((C+1))
             # fi
 
-            if [ ${ChoiceResult} == *"Minor"* ]
+            if [ ${ChoiceResult} == "Minor" ]
                 then
                     C=\$((C+1))
+                    echo "Executing Minor"
             fi
-            if [ ${ChoiceResult} == *"Middle"* ]
+            if [ ${ChoiceResult} == "Middle" ]
                 then
                     B=\$((B+1))
                     C=0
+                    echo "Executing Middle"
             fi
-            if [ ${ChoiceResult} == *"Major"* ]
+            if [ ${ChoiceResult} == "Major" ]
                 then
                     A=\$((A+1))
                     B=0
                     C=0
+                    echo "Executing Major"
             fi
 
             echo "[\$A.\$B.\$C]" > outFile
