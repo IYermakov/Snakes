@@ -16,7 +16,7 @@ pipeline {
     booleanParam(name: 'Test', defaultValue: false, description: 'Test Docker Image with Java web application')
     booleanParam(name: 'Push to ECR', defaultValue: false, description: 'Push docker image to ECR')
     booleanParam(name: 'Deploy ECS stack', defaultValue: false, description: 'Deploy ECS stack')
-    booleanParam(name: 'Tag', defaultValue: false, description: 'TAG git commit and docker image')
+    booleanParam(name: 'SetNewTag', defaultValue: false, description: 'TAG git commit and docker image')
     choice(name: 'Tagging', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
   }
   environment {
@@ -41,7 +41,7 @@ pipeline {
     }
 
     stage("Tagging"){
-      when { environment name: 'Tag', value: 'true' }
+      when { environment name: 'SetNewTag', value: 'true' }
       steps {
         script {
             sh ''' echo "Executing Tagging"
