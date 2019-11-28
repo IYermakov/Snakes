@@ -30,7 +30,7 @@ pipeline {
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
     String result='0.0.0';
-    ChoiceResult = params.Tagging
+    ChoiceResult = "${params.Tagging}"
   }
 
   stages{
