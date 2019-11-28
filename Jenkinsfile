@@ -72,17 +72,20 @@ pipeline {
             #    C=\$((C+1))
             # fi
 
-            if [ ${ChoiceResult} -eq 'Minor' ] then
-                C=\$((C+1))
+            if [ ${ChoiceResult} -eq 'Minor' ]
+                then
+                    C=\$((C+1))
             fi
-            if [ ${ChoiceResult} -eq 'Middle' ] then
-                B=\$((B+1))
-                C=0
+            if [ ${ChoiceResult} -eq 'Middle' ]
+                then
+                    B=\$((B+1))
+                    C=0
             fi
-            if [ ${ChoiceResult} -eq 'Major' ] then
-                A=\$((A+1))
-                B=0
-                C=0
+            if [ ${ChoiceResult} -eq 'Major' ]
+                then
+                    A=\$((A+1))
+                    B=0
+                    C=0
             fi
 
             echo "[\$A.\$B.\$C]" > outFile
