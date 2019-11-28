@@ -47,7 +47,7 @@ pipeline {
             sh ''' echo "Executing Tagging"
             version=\$(git describe --tags `git rev-list --tags --max-count=1`)
             FirstSet=\$(echo \$version | cut -d '.' -f 1)
-            if [ \$FirstSet -ge 2 ];
+            if [ \$#FirstSet -ge 2 ];
                 then
                     Prefix=\$(echo \$FirstSet | cut -d '-' -f 1)
                     A=\$(echo \$FirstSet | cut -d '-' -f 2)
@@ -57,7 +57,7 @@ pipeline {
             fi
             B=\$(echo \$version | cut -d '.' -f 2)
             C=\$(echo \$version | cut -d '.' -f 3)
-            echo " *** ORIGIN VERSION A= \$A, B=\$B, C=\$C *** "
+            echo " *** ORIGIN VERSION A=\$A, B=\$B, C=\$C *** "
             if [ ${ChoiceResult} == "Minor" ]
                 then
                     C=\$((C+1))
