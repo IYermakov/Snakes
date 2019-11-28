@@ -41,7 +41,8 @@ pipeline {
       }
     }
 
-    stage("Parsing of version A.B.C"){
+    stage("Tagging"){
+      when { environment name: 'TAG', value: 'true' }
       steps {
         script {
             sh ''' echo "Executing Tagging"
