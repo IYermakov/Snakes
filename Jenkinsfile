@@ -11,14 +11,12 @@ pipeline {
     timestamps()
   }
   parameters {
-    // string(defaultValue: '0.0.0', description: 'A version of Release', name: 'VERSION')
+    string(defaultValue: '0.0.0', description: 'A version of Release', name: 'VERSION')
     booleanParam(name: 'BuildApp', defaultValue: true, description: '')
     booleanParam(name: 'Test', defaultValue: true, description: '')
     booleanParam(name: 'Delivery', defaultValue: false, description: '')
     booleanParam(name: 'Tagging', defaultValue: false, description: '')
     booleanParam(name: 'Deployment', defaultValue: false, description: '')
-    booleanParam(name: 'SetNewTag', defaultValue: false, description: 'TAG git commit and docker image')
-    choice(name: 'Version', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -30,66 +28,16 @@ pipeline {
     Delivery = "${params.Delivery}"
     Tagging = "${params.Tagging}"
     Deployment = "${params.Deployment}"
-    Tag = ""
-    String result='0.0.0';
-    ChoiceResult = "${params.Version}"
+    Tag = "${params.VERSION}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
   stages {
-    stage("Versioning"){
-      when { environment name: 'SetNewTag', value: 'true' }
-      steps {
-        script {
-            sh ''' echo "Executing Tagging"
-            version=\$(git describe --tags `git rev-list --tags --max-count=1`)
-            FirstSet=\$(echo \$version | cut -d '.' -f 1)
-            if [ \${#FirstSet} -ge 2 ];
-                then
-                    Prefix=\$(echo \$FirstSet | cut -d '-' -f 1)
-                    A=\$(echo \$FirstSet | cut -d '-' -f 2)
-                else
-                    Prefix=""
-                    A=\$FirstSet
-            fi
-            B=\$(echo \$version | cut -d '.' -f 2)
-            C=\$(echo \$version | cut -d '.' -f 3)
-            echo " *** ORIGIN VERSION A=\$A, B=\$B, C=\$C *** "
-            if [ ${ChoiceResult} == "Major" ]
-                then
-                    A=\$((A+1))
-                    B=0
-                    C=0
-                    echo "Executing Major"
-            fi
-            if [ ${ChoiceResult} == "Middle" ]
-                then
-                    B=\$((B+1))
-                    C=0
-                    echo "Executing Middle"
-                else
-                    C=\$((C+1))
-                    echo "Executing Minor"
-            fi
-            echo "[\$Prefix-\$A.\$B.\$C]" > outFile
-            echo Increased: A=\$A, B=\$B, C=\$C
-            '''
-            nextVersion = readFile 'outFile'
-            result = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
-            echo "We will --tag '${result}'"
-
-            // Set new Tag
-            // sh "git status"
-            // sh "git tag -a ${result} -m 'Added tag ${result}'"
-            // sh "git push origin ${result}"
-        }
-      }
-    }
     stage("Condition") {
       steps {
         script {
           if (Tagging == 'true') {
-            Tag = "${result}"
+            Tag = "rc-${Tag}"
           } else {
             Tag = "${BRANCH_NAME}-${BUILD_NUMBER}"
           }
