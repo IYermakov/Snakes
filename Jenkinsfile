@@ -18,7 +18,7 @@ pipeline {
     booleanParam(name: 'TAG', defaultValue: false, description: 'TAG git commit and docker image')
     booleanParam(name: 'Push to ECR', defaultValue: false, description: 'Push docker image to ECR')
     booleanParam(name: 'Deploy ECS stack', defaultValue: false, description: 'Deploy ECS stack')
-    choice(name: 'Tagging', choices: ['Save OLD version', 'Increase Minor  version', 'Increase Middle version', 'Increase Major  version'], description: 'Pick Version Tag')
+    choice(name: 'Tagging', choices: ['SaveOLD', 'Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -30,6 +30,7 @@ pipeline {
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
     String result='0.0.0';
+    ChoiceResult = params.Tagging
   }
 
   stages{
@@ -55,21 +56,30 @@ pipeline {
             incrA=\$A
             incrB=\$B
             incrC=\$C
-            echo A= \$A, B=\$B, C=\$C
+            echo *** ORIGIN VERSION A= \$A, B=\$B, C=\$C ***
 
-            if [ \$C -gt 8 ]
-                then
-                    if [ \$B -gt 8 ]
-                        then
-                            A=\$((A+1))
-                            B=0 C=0
-                    else
-                        B=\$((B+1))
-                        C=0
-                    fi
+            # if [ \$C -gt 8 ]
+            #    then
+            #        if [ \$B -gt 8 ]
+            #            then
+            #                A=\$((A+1))
+            #                B=0 C=0
+            #        else
+            #            B=\$((B+1))
+            #            C=0
+            #        fi
+            # else
+            #    C=\$((C+1))
+            # fi
+
+            if [ ${ChoiceResult} -eq 'Minor' ] then C=\$((C+1))
             else
-                C=\$((C+1))
+            if [ ${ChoiceResult} -eq 'Middle' ] then B=\$((B+1)) C=0
+            else
+            if [ ${ChoiceResult} -eq 'Major' ] then A=\$((A+1)) B=0 C=0
             fi
+
+
             echo "[\$A.\$B.\$C]" > outFile
             echo Try to read outFile
             cat outFile
@@ -99,7 +109,7 @@ pipeline {
 
     stage("Choice --SaveOldVersion"){
       when {
-        equals expected: "Save OLD version", actual: params.Tagging
+        equals expected: "SaveOLD", actual: ChoiceResult
       }
       steps {
         echo 'Deploying --SaveOldVersion'
@@ -110,7 +120,7 @@ pipeline {
 
     stage("Choice --IncreaseMinorVersion"){
       when {
-        equals expected: "Increase Minor  version", actual: params.Tagging
+        equals expected: "Minor", actual: ChoiceResult
       }
       steps {
         echo 'Deploying --IncreaseMinorVersion'
@@ -121,7 +131,7 @@ pipeline {
 
     stage("Choice --IncreaseMiddleVersion"){
       when {
-        equals expected: "Increase Middle version", actual: params.Tagging
+        equals expected: "Middle", actual: ChoiceResult
       }
       steps {
         echo 'Deploying --IncreaseMiddleVersion'
@@ -132,7 +142,7 @@ pipeline {
 
     stage("Choice --IncreaseMajorVersion"){
       when {
-        equals expected: "Increase Major  version", actual: params.Tagging
+        equals expected: "Major", actual: ChoiceResult
       }
       steps {
         echo 'Deploying --IncreaseMajorVersion'
