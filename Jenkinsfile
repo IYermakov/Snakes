@@ -47,7 +47,8 @@ pipeline {
             sh ''' echo "Executing Tagging"
             version=\$(git describe --tags `git rev-list --tags --max-count=1`)
             # Version to get the latest tag
-            A=\$(echo \$version | cut -d '.' -f 1)
+            Aprefix=\$(echo \$version | cut -d '.' -f 1)
+            A=\$(echo \$Aprefix | cut -d '-' -f 2)
             B=\$(echo \$version | cut -d '.' -f 2)
             C=\$(echo \$version | cut -d '.' -f 3)
             echo "[\$A]" > outFileA
