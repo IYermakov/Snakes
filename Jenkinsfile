@@ -22,7 +22,7 @@ pipeline {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
-    OPSRepoBranch = 'ecs-spot'
+    OPSRepoBranch = 'weighted-tgs'
     BuildApp = "${params.BuildApp}"
     Test = "${params.Test}"
     Delivery = "${params.Delivery}"
