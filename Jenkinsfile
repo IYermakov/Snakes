@@ -56,7 +56,7 @@ pipeline {
             incrA=\$A
             incrB=\$B
             incrC=\$C
-            echo *** ORIGIN VERSION A= \$A, B=\$B, C=\$C ***
+            echo " *** ORIGIN VERSION A= \$A, B=\$B, C=\$C *** "
 
             # if [ \$C -gt 8 ]
             #    then
@@ -72,13 +72,9 @@ pipeline {
             #    C=\$((C+1))
             # fi
 
-            if [ ${ChoiceResult} -eq 'Minor' ] then C=\$((C+1))
-            else
-            if [ ${ChoiceResult} -eq 'Middle' ] then B=\$((B+1)) C=0
-            else
-            if [ ${ChoiceResult} -eq 'Major' ] then A=\$((A+1)) B=0 C=0
-            fi
-
+            if [ ${ChoiceResult} -eq 'Minor' ] then C=\$((C+1)) fi
+            if [ ${ChoiceResult} -eq 'Middle' ] then B=\$((B+1)) C=0 fi
+            if [ ${ChoiceResult} -eq 'Major' ] then A=\$((A+1)) B=0 C=0 fi
 
             echo "[\$A.\$B.\$C]" > outFile
             echo Try to read outFile
