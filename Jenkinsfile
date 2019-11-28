@@ -73,16 +73,16 @@ pipeline {
             #    C=\$((C+1))
             # fi
 
-            if [ ${ChoiceResult} -eq 'Minor' ]
+            if [ ${ChoiceResult} == *"Minor"* ]
                 then
                     C=\$((C+1))
             fi
-            if [ ${ChoiceResult} -eq 'Middle' ]
+            if [ ${ChoiceResult} == *"Middle"* ]
                 then
                     B=\$((B+1))
                     C=0
             fi
-            if [ ${ChoiceResult} -eq 'Major' ]
+            if [ ${ChoiceResult} == *"Major"* ]
                 then
                     A=\$((A+1))
                     B=0
