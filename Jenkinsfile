@@ -11,7 +11,6 @@ pipeline {
     timestamps()
   }
   parameters {
-
     booleanParam(name: 'Build application', defaultValue: true, description: 'Build Java   web application')
     booleanParam(name: 'Build Docker Image', defaultValue: false, description: 'Build Docker Image with Java web application')
     booleanParam(name: 'Test', defaultValue: false, description: 'Test Docker Image with Java web application')
