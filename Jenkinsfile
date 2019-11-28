@@ -125,17 +125,6 @@ pipeline {
         }
       }
     }
-    // stage("Tag and Deploy") {
-    //   when { environment name: 'Tag_Deploy', value: 'true' }
-    //   steps {
-    //     script {
-    //       build job: 'docker-pipe-2',
-    //         parameters: [
-    //           string(name: 'passed_Tag', value: "${Tag}")
-    //         ]
-    //     }
-    //   }
-    // }
     stage("Tagging") {
       when { environment name: 'Tagging', value: 'true' }
       steps {
