@@ -161,7 +161,7 @@ pipeline {
         sh 'docker images'
       }
     }
-    stage("Create stack") {
+    stage("Create stack on ECS") {
       when { environment name: 'Deployment', value: 'true' }
       steps {
         script {
