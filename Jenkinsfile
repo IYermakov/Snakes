@@ -33,7 +33,7 @@ pipeline {
   }
 
   stages{
-    stage("preparation"){
+    stage("Preparation"){
       steps {
          sh 'echo Build Preparation'
          checkout scm
@@ -41,7 +41,7 @@ pipeline {
     }
 
     stage("Tagging"){
-      when { environment name: 'TAG', value: 'true' }
+      when { environment name: 'Test', value: 'true' }
       steps {
         script {
             sh ''' echo "Executing Tagging"
