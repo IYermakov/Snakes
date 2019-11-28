@@ -93,7 +93,7 @@ pipeline {
                     echo "Executing Major"
             fi
 
-            echo "[\$A.\$B.\$C]" > outFile
+            echo "[\$Prefix-\$A.\$B.\$C]" > outFile
             # echo Try to read outFile
             # cat outFile
             # let incrA++
