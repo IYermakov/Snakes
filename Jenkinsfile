@@ -15,10 +15,10 @@ pipeline {
     booleanParam(name: 'Build application', defaultValue: true, description: 'Build Java   web application')
     booleanParam(name: 'Build Docker Image', defaultValue: false, description: 'Build Docker Image with Java web application')
     booleanParam(name: 'Test', defaultValue: false, description: 'Test Docker Image with Java web application')
-    booleanParam(name: 'TAG', defaultValue: false, description: 'TAG git commit and docker image')
     booleanParam(name: 'Push to ECR', defaultValue: false, description: 'Push docker image to ECR')
     booleanParam(name: 'Deploy ECS stack', defaultValue: false, description: 'Deploy ECS stack')
-    choice(name: 'Tagging', choices: ['SaveOLD', 'Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
+    booleanParam(name: 'TAG', defaultValue: false, description: 'TAG git commit and docker image')
+    choice(name: 'Tagging', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -59,23 +59,21 @@ pipeline {
             B=\$(echo \$version | cut -d '.' -f 2)
             C=\$(echo \$version | cut -d '.' -f 3)
             echo " *** ORIGIN VERSION A=\$A, B=\$B, C=\$C *** "
-            if [ ${ChoiceResult} == "Minor" ]
-                then
-                    C=\$((C+1))
-                    echo "Executing Minor"
-            fi
-            if [ ${ChoiceResult} == "Middle" ]
-                then
-                    B=\$((B+1))
-                    C=0
-                    echo "Executing Middle"
-            fi
             if [ ${ChoiceResult} == "Major" ]
                 then
                     A=\$((A+1))
                     B=0
                     C=0
                     echo "Executing Major"
+            fi
+            if [ ${ChoiceResult} == "Middle" ]
+                then
+                    B=\$((B+1))
+                    C=0
+                    echo "Executing Middle"
+                else
+                    C=\$((C+1))
+                    echo "Executing Minor"
             fi
             echo "[\$Prefix-\$A.\$B.\$C]" > outFile
             echo Increased: A=\$A, B=\$B, C=\$C
