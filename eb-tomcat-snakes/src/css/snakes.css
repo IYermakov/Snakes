@@ -16,7 +16,7 @@
 html,
 body {
   height: 100%;
-  background-color: rgba(255,255,200,1);
+  background-color: green;
 }
 
 body {
@@ -41,29 +41,29 @@ a:focus {
 }
 
 /* Parallax images */
-#badsnake { 
-  background: url(../images/badsnake.jpg) 100% 0 fixed; 
-  height: 200px;  
+#badsnake {
+  background: url(../images/badsnake.jpg) 100% 0 fixed;
+  height: 200px;
 }
-#badsnake2 { 
-  background: url(../images/badsnake2.jpg) 100% 0 fixed; 
-  height: 200px;  
+#badsnake2 {
+  background: url(../images/badsnake2.jpg) 100% 0 fixed;
+  height: 200px;
 }
-#badsnake3 { 
-  background: url(../images/badsnake3.jpg) 100% 0 fixed; 
-  height: 200px;  
+#badsnake3 {
+  background: url(../images/badsnake3.jpg) 100% 0 fixed;
+  height: 200px;
 }
-#goodsnake { 
-  background: url(../images/goodsnake.jpg) 100% 0 fixed; 
-  height: 200px;  
+#goodsnake {
+  background: url(../images/goodsnake.jpg) 100% 0 fixed;
+  height: 200px;
 }
-#goodsnake2 { 
-  background: url(../images/goodsnake2.jpg) 100% 0 fixed; 
-  height: 200px;  
+#goodsnake2 {
+  background: url(../images/goodsnake2.jpg) 100% 0 fixed;
+  height: 200px;
 }
-#goodsnake3 { 
-  background: url(../images/goodsnake3.jpg) 100% 0 fixed; 
-  height: 200px;  
+#goodsnake3 {
+  background: url(../images/goodsnake3.jpg) 100% 0 fixed;
+  height: 200px;
 }
 
 /* Table */
