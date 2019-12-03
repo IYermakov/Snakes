@@ -169,7 +169,7 @@ pipeline {
         script {
           try {
             dir("${OPSRepoBranch}") {
-              sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} DeploymentColor=${DeploymentColor} --capabilities CAPABILITY_IAM --region us-east-1"
+              sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ECS/ecs-task-${Tag}.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} DeploymentColor=${DeploymentColor} --capabilities CAPABILITY_IAM --region us-east-1"
             }
             currentBuild.result = 'SUCCESS'
             emailext body: 'Application was successfully deployed to ECS.', subject: "JOB with identifier ${Tag} SUCCESS", to: "${Email}"
