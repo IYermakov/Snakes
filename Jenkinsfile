@@ -12,9 +12,8 @@ pipeline {
   }
   parameters {
     string(defaultValue: '0.0.0', description: 'A version of Release', name: 'VERSION')
-    booleanParam(name: 'BuildApp', defaultValue: true, description: '')
-    booleanParam(name: 'Test', defaultValue: true, description: '')
-    booleanParam(name: 'Delivery', defaultValue: false, description: '')
+    booleanParam(name: 'Build-Test', defaultValue: true, description: '')
+    booleanParam(name: 'Release', defaultValue: false, description: '')
     booleanParam(name: 'Tagging', defaultValue: false, description: '')
     booleanParam(name: 'Deployment', defaultValue: false, description: '')
     choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
@@ -24,10 +23,8 @@ pipeline {
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'weighted-tgs'
-    BuildApp = "${params.BuildApp}"
-    Test = "${params.Test}"
-    Delivery = "${params.Delivery}"
-    Tagging = "${params.Tagging}"
+    Build = "${params.Build-Test}"
+    Release = "${params.Release}"
     Deployment = "${params.Deployment}"
     Tag = "${params.VERSION}"
     DeploymentColor = "${params.DeploymentColor}"
@@ -38,7 +35,7 @@ pipeline {
     stage("Condition") {
       steps {
         script {
-          if (Tagging == 'true') {
+          if (Release == 'true') {
             Tag = "${Tag}"
           } else {
             Tag = "${BRANCH_NAME}-${BUILD_NUMBER}"
@@ -46,8 +43,8 @@ pipeline {
         }
       }
     }
-    stage("Build app") {
-      when { environment name: 'BuildApp', value: 'true' }
+    stage("Build") {
+      when { environment name: 'Build', value: 'true' }
       steps {
         script {
           try {
@@ -64,7 +61,7 @@ pipeline {
       }
     }
     stage("Build Docker Image") {
-      when { environment name: 'BuildApp', value: 'true' }
+      when { environment name: 'Build', value: 'true' }
       steps {
         script {
           try {
@@ -82,7 +79,7 @@ pipeline {
       }
     }
     stage("Test") {
-      when { environment name: 'Test', value: 'true' }
+      when { environment name: 'Build', value: 'true' }
       steps {
         script {
           try {
@@ -106,7 +103,7 @@ pipeline {
       }
     }
     stage("Push artifact to ECR") {
-      when { environment name: 'Delivery', value: 'true' }
+      when { environment name: 'Release', value: 'true' }
       steps {
         script {
           try {
@@ -128,7 +125,7 @@ pipeline {
       }
     }
     stage("Tagging") {
-      when { environment name: 'Tagging', value: 'true' }
+      when { environment name: 'Release', value: 'true' }
       steps {
         script {
           try {
