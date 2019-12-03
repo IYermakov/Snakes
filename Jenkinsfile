@@ -17,6 +17,7 @@ pipeline {
     booleanParam(name: 'Delivery', defaultValue: false, description: '')
     booleanParam(name: 'Tagging', defaultValue: false, description: '')
     booleanParam(name: 'Deployment', defaultValue: false, description: '')
+    choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -29,6 +30,7 @@ pipeline {
     Tagging = "${params.Tagging}"
     Deployment = "${params.Deployment}"
     Tag = "${params.VERSION}"
+    DeploymentColor = "${params.DeploymentColor}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
@@ -167,7 +169,7 @@ pipeline {
         script {
           try {
             dir("${OPSRepoBranch}") {
-              sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} --capabilities CAPABILITY_IAM --region us-east-1"
+              sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} DeploymentColor=${DeploymentColor} --capabilities CAPABILITY_IAM --region us-east-1"
             }
             currentBuild.result = 'SUCCESS'
             emailext body: 'Application was successfully deployed to ECS.', subject: "JOB with identifier ${Tag} SUCCESS", to: "${Email}"
