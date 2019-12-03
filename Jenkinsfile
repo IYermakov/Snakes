@@ -12,7 +12,7 @@ pipeline {
   }
   parameters {
     string(defaultValue: '0.0.0', description: 'A version of Release', name: 'VERSION')
-    booleanParam(name: 'Build-Test', defaultValue: true, description: '')
+    booleanParam(name: 'Build&Test', defaultValue: true, description: '')
     booleanParam(name: 'Release', defaultValue: false, description: '')
     booleanParam(name: 'Deployment', defaultValue: false, description: '')
     choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
@@ -22,7 +22,7 @@ pipeline {
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'weighted-tgs'
-    Build-Test = "${params.Build-Test}"
+    BuildAndTest = "${params.Build&Test}"
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
     Tag = "${params.VERSION}"
@@ -43,7 +43,7 @@ pipeline {
       }
     }
     stage("Build") {
-      when { environment name: 'Build-Test', value: 'true' }
+      when { environment name: 'BuildAndTest', value: 'true' }
       steps {
         script {
           try {
@@ -60,7 +60,7 @@ pipeline {
       }
     }
     stage("Build Docker Image") {
-      when { environment name: 'Build-Test', value: 'true' }
+      when { environment name: 'BuildAndTest', value: 'true' }
       steps {
         script {
           try {
@@ -78,7 +78,7 @@ pipeline {
       }
     }
     stage("Test") {
-      when { environment name: 'Build-Test', value: 'true' }
+      when { environment name: 'BuildAndTest', value: 'true' }
       steps {
         script {
           try {
