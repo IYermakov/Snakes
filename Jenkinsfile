@@ -14,7 +14,6 @@ pipeline {
     string(defaultValue: '0.0.0', description: 'A version of Release', name: 'VERSION')
     booleanParam(name: 'Build-Test', defaultValue: true, description: '')
     booleanParam(name: 'Release', defaultValue: false, description: '')
-    booleanParam(name: 'Tagging', defaultValue: false, description: '')
     booleanParam(name: 'Deployment', defaultValue: false, description: '')
     choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
   }
