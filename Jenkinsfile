@@ -12,7 +12,7 @@ pipeline {
   }
   parameters {
     string(defaultValue: '0.0.0', description: 'A version of Release', name: 'VERSION')
-    booleanParam(name: 'Build&Test', defaultValue: true, description: '')
+    booleanParam(name: 'Build', defaultValue: true, description: '')
     booleanParam(name: 'Release', defaultValue: false, description: '')
     booleanParam(name: 'Deployment', defaultValue: false, description: '')
     choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
@@ -22,7 +22,7 @@ pipeline {
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'weighted-tgs'
-    BuildAndTest = "${params.Build&Test}"
+    BuildAndTest = "${params.Build}"
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
     Tag = "${params.VERSION}"
