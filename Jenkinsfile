@@ -11,27 +11,22 @@ pipeline {
     timestamps()
   }
   parameters {
-    booleanParam(name: 'BuildApp', defaultValue: true, description: '')
-    booleanParam(name: 'Test', defaultValue: true, description: '')
-    booleanParam(name: 'Delivery', defaultValue: false, description: '')
-    booleanParam(name: 'Tagging', defaultValue: false, description: '')
+    string(defaultValue: '0.0.0', description: 'A version of Release', name: 'VERSION')
+    booleanParam(name: 'Build', defaultValue: true, description: '')
+    booleanParam(name: 'Release', defaultValue: false, description: '')
     booleanParam(name: 'Deployment', defaultValue: false, description: '')
-    booleanParam(name: 'SetNewTag', defaultValue: false, description: 'TAG git commit and docker image')
-    choice(name: 'Version', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
+    choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'weighted-tgs'
-    BuildApp = "${params.BuildApp}"
-    Test = "${params.Test}"
-    Delivery = "${params.Delivery}"
-    Tagging = "${params.Tagging}"
+    BuildAndTest = "${params.Build}"
+    Release = "${params.Release}"
     Deployment = "${params.Deployment}"
-    Tag = ""
-    String result='0.0.0';
-    ChoiceResult = "${params.Version}"
+    Tag = "${params.VERSION}"
+    DeploymentColor = "${params.DeploymentColor}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
@@ -82,16 +77,16 @@ pipeline {
     stage("Condition") {
       steps {
         script {
-          if (Tagging == 'true') {
-            Tag = "${result}"
+          if (Release == 'true') {
+            Tag = "${Tag}"
           } else {
             Tag = "${BRANCH_NAME}-${BUILD_NUMBER}"
           }
         }
       }
     }
-    stage("Build app") {
-      when { environment name: 'BuildApp', value: 'true' }
+    stage("Build") {
+      when { environment name: 'BuildAndTest', value: 'true' }
       steps {
         script {
           try {
@@ -108,7 +103,7 @@ pipeline {
       }
     }
     stage("Build Docker Image") {
-      when { environment name: 'BuildApp', value: 'true' }
+      when { environment name: 'BuildAndTest', value: 'true' }
       steps {
         script {
           try {
@@ -126,7 +121,7 @@ pipeline {
       }
     }
     stage("Test") {
-      when { environment name: 'Test', value: 'true' }
+      when { environment name: 'BuildAndTest', value: 'true' }
       steps {
         script {
           try {
@@ -150,7 +145,7 @@ pipeline {
       }
     }
     stage("Push artifact to ECR") {
-      when { environment name: 'Delivery', value: 'true' }
+      when { environment name: 'Release', value: 'true' }
       steps {
         script {
           try {
@@ -172,7 +167,7 @@ pipeline {
       }
     }
     stage("Tagging") {
-      when { environment name: 'Tagging', value: 'true' }
+      when { environment name: 'Release', value: 'true' }
       steps {
         script {
           try {
@@ -213,7 +208,8 @@ pipeline {
         script {
           try {
             dir("${OPSRepoBranch}") {
-              sh "aws cloudformation deploy --stack-name ECS-task --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} --capabilities CAPABILITY_IAM --region us-east-1"
+              UnicId = "${Tag}".replaceAll("\\.", "-")
+              sh "aws cloudformation deploy --stack-name ECS-task-${UnicId} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} ServiceName=snakes-${UnicId} DeploymentColor=${DeploymentColor} --capabilities CAPABILITY_IAM --region us-east-1"
             }
             currentBuild.result = 'SUCCESS'
             emailext body: 'Application was successfully deployed to ECS.', subject: "JOB with identifier ${Tag} SUCCESS", to: "${Email}"
