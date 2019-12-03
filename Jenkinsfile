@@ -170,7 +170,6 @@ pipeline {
           try {
             dir("${OPSRepoBranch}") {
               StackNameId = "${Tag}".replaceAll("\\.", "-")
-              }
               sh "aws cloudformation deploy --stack-name ECS-task-${StackNameId} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} DeploymentColor=${DeploymentColor} --capabilities CAPABILITY_IAM --region us-east-1"
             }
             currentBuild.result = 'SUCCESS'
