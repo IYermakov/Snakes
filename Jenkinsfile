@@ -39,7 +39,7 @@ pipeline {
       steps {
         script {
           if (Tagging == 'true') {
-            Tag = "rc-${Tag}"
+            Tag = "${Tag}"
           } else {
             Tag = "${BRANCH_NAME}-${BUILD_NUMBER}"
           }
@@ -169,7 +169,9 @@ pipeline {
         script {
           try {
             dir("${OPSRepoBranch}") {
-              sh "aws cloudformation deploy --stack-name ECS-task-${Tag} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} DeploymentColor=${DeploymentColor} --capabilities CAPABILITY_IAM --region us-east-1"
+              StackNameId = "${Tag}".replaceAll("\\.", "-")
+              }
+              sh "aws cloudformation deploy --stack-name ECS-task-${StackNameId} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} DeploymentColor=${DeploymentColor} --capabilities CAPABILITY_IAM --region us-east-1"
             }
             currentBuild.result = 'SUCCESS'
             emailext body: 'Application was successfully deployed to ECS.', subject: "JOB with identifier ${Tag} SUCCESS", to: "${Email}"
