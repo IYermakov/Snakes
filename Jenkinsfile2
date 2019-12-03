@@ -34,7 +34,6 @@ pipeline {
             dir("${OPSRepoBranch}") {
               git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}", credentialsId: "devopsa3")
               sh "aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/ECS/alb.yml --parameter-overrides VPCStackName=DevVPC BlueWeight=9 GreenWeight=1  --capabilities CAPABILITY_IAM --region us-east-1"
-              }
             }
             currentBuild.result = 'SUCCESS'
           }
