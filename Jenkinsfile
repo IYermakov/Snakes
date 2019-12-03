@@ -22,7 +22,7 @@ pipeline {
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'weighted-tgs'
-    Build = "${params.Build-Test}"
+    Build-Test = "${params.Build-Test}"
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
     Tag = "${params.VERSION}"
@@ -43,7 +43,7 @@ pipeline {
       }
     }
     stage("Build") {
-      when { environment name: 'Build', value: 'true' }
+      when { environment name: 'Build-Test', value: 'true' }
       steps {
         script {
           try {
@@ -60,7 +60,7 @@ pipeline {
       }
     }
     stage("Build Docker Image") {
-      when { environment name: 'Build', value: 'true' }
+      when { environment name: 'Build-Test', value: 'true' }
       steps {
         script {
           try {
@@ -78,7 +78,7 @@ pipeline {
       }
     }
     stage("Test") {
-      when { environment name: 'Build', value: 'true' }
+      when { environment name: 'Build-Test', value: 'true' }
       steps {
         script {
           try {
