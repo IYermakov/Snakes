@@ -15,7 +15,7 @@ pipeline {
     booleanParam(name: 'Build', defaultValue: true, description: '')
     booleanParam(name: 'Release', defaultValue: false, description: '')
     booleanParam(name: 'Deployment', defaultValue: false, description: '')
-    booleanParam(name: 'SetNewTag', defaultValue: false, description: 'TAG git commit and docker image')	    choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
+    booleanParam(name: 'SetNewTag', defaultValue: false, description: 'TAG git commit and docker image')
     choice(name: 'Version', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
     choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
   }
