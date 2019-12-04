@@ -53,7 +53,7 @@ pipeline {
         script {
           try {
             dir("${OPSRepoBranch}") {
-              StackName = sh /aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" | tail -1/
+              StackName = sh '''aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" | tail -1'''
               sh "aws cloudformation delete-stack --stack-name ${StackName} --region us-east-1"
             }
             currentBuild.result = 'SUCCESS'
