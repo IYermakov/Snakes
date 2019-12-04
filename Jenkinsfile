@@ -213,7 +213,7 @@ pipeline {
                  CurrentStack=\$(aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" --region us-east-1 | tail -1)
                  CurrentDeploymentColor=\$(aws cloudformation describe-stacks --stack-name \$CurrentStack --query "Stacks[].Parameters[?ParameterKey=='DeploymentColor'].ParameterValue" --output text --region us-east-1)
                  NewDeploymentColor="Green"
-                 if [ ${CurrentDeploymentColor} == "Green" ]
+                 if [ \$CurrentDeploymentColor == "Green" ]
                      then
                          NewDeploymentColor="Blue"
                  fi
