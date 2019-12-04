@@ -54,7 +54,7 @@ pipeline {
         script {
           try {
             dir("${OPSRepoBranch}") {
-              sh "aws cloudformation delete-stack --stack-name ${StackName} --region us-east-1"
+              sh "aws cloudformation delete-stack --region us-east-1 --stack-name ${StackName}"
             }
             currentBuild.result = 'SUCCESS'
           }
