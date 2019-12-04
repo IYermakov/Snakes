@@ -11,10 +11,12 @@ pipeline {
     timestamps()
   }
   parameters {
-    string(defaultValue: '0.0.0', description: 'A version of Release', name: 'VERSION')
+    // string(defaultValue: '0.0.0', description: 'A version of Release', name: 'VERSION')
     booleanParam(name: 'Build', defaultValue: true, description: '')
     booleanParam(name: 'Release', defaultValue: false, description: '')
     booleanParam(name: 'Deployment', defaultValue: false, description: '')
+    booleanParam(name: 'SetNewTag', defaultValue: false, description: 'TAG git commit and docker image')	    choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
+    choice(name: 'Version', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
     choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
   }
   environment {
@@ -25,7 +27,9 @@ pipeline {
     BuildAndTest = "${params.Build}"
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
-    Tag = "${params.VERSION}"
+    Tag = ""
+    Result = '0.0.0'
+    ChoiceResult = "${params.Version}"
     DeploymentColor = "${params.DeploymentColor}"
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
@@ -69,8 +73,8 @@ pipeline {
             echo Increased: A=\$A, B=\$B, C=\$C
             '''
             nextVersion = readFile 'outFile'
-            result = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
-            echo "We will --tag '${result}'"
+            Result = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
+            echo "We will --tag '${Result}'"
         }
       }
     }
@@ -78,7 +82,7 @@ pipeline {
       steps {
         script {
           if (Release == 'true') {
-            Tag = "${Tag}"
+            Tag = "${Result}"
           } else {
             Tag = "${BRANCH_NAME}-${BUILD_NUMBER}"
           }
