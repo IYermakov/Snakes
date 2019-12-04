@@ -17,10 +17,10 @@ pipeline {
     booleanParam(name: 'Deployment', defaultValue: false, description: '')
     booleanParam(name: 'SetNewTag', defaultValue: false, description: 'TAG git commit and docker image')
     choice(name: 'Version', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
-    // choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
+    AWSRegion = 'us-east-1'
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'weighted-tgs'
@@ -149,7 +149,7 @@ pipeline {
       steps {
         script {
           try {
-            sh '$(aws ecr get-login --no-include-email --region us-east-1)'
+            sh '$(aws ecr get-login --no-include-email --region ${AWSRegion})'
             docker.withRegistry("https://${ECRURI}") {
               dockerImage.push()
             }
@@ -210,14 +210,14 @@ pipeline {
             dir("${OPSRepoBranch}") {
               UnicId = "${Tag}".replaceAll("\\.", "-")
               sh """
-                 CurrentStack=\$(aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" --region us-east-1 | tail -1)
-                 CurrentDeploymentColor=\$(aws cloudformation describe-stacks --stack-name \$CurrentStack --query "Stacks[].Parameters[?ParameterKey=='DeploymentColor'].ParameterValue" --output text --region us-east-1)
+                 CurrentStack=\$(aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" --region ${AWSRegion} | tail -1)
+                 CurrentDeploymentColor=\$(aws cloudformation describe-stacks --stack-name \$CurrentStack --query "Stacks[].Parameters[?ParameterKey=='DeploymentColor'].ParameterValue" --output text --region ${AWSRegion} | tail -1)
                  NewDeploymentColor="Green"
                  if [ \$CurrentDeploymentColor == "Green" ]
                      then
                          NewDeploymentColor="Blue"
                  fi
-                 aws cloudformation deploy --stack-name ECS-task-${UnicId} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} ServiceName=snakes-${UnicId} DeploymentColor=\$NewDeploymentColor --capabilities CAPABILITY_IAM --region us-east-1
+                 aws cloudformation deploy --stack-name ECS-task-${UnicId} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} ServiceName=snakes-${UnicId} DeploymentColor=\$NewDeploymentColor --capabilities CAPABILITY_IAM --region ${AWSRegion}
                  echo "CurrentStack           = \$CurrentStack"
                  echo "CurrentDeploymentColor = \$CurrentDeploymentColor"
                  echo "NewDeploymentColor     = \$NewDeploymentColor"
