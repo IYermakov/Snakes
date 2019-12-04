@@ -30,7 +30,7 @@ pipeline {
     Tag = '0.0.0'
     ChoiceResult = "${params.Version}"
     CurrentStack = sh(script: '''aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" --region us-east-1 | tail -1''', returnStdout: true)
-    DeploymentColor = sh(script: "aws cloudformation describe-stacks --region us-east-1 --stack-name ${CurrentStack} --query '''Stacks[].Parameters[?ParameterKey=='DeploymentColor'].ParameterValue''' --output text", returnStdout: true)
+    DeploymentColor = sh(script: '''aws cloudformation describe-stacks --stack-name ${CurrentStack} --query "Stacks[].Parameters[?ParameterKey=='DeploymentColor'].ParameterValue" --output text --region us-east-1''', returnStdout: true)
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
