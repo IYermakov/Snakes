@@ -15,7 +15,7 @@ pipeline {
     choice(name: 'BlueWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: '')
     choice(name: 'GreenWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: '')
     booleanParam(name: 'RemovePreviousVersion', defaultValue: false, description: '')
-    string(defaultValue: 'ECS-task-0-0-0', description: 'The name of the Stack to be deleted', name: 'StackName')
+    // string(defaultValue: 'ECS-task-0-0-0', description: 'The name of the Stack to be deleted', name: 'StackName')
   }
   environment {
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
@@ -23,7 +23,7 @@ pipeline {
     BlueWeight = "${params.BlueWeight}"
     GreenWeight = "${params.GreenWeight}"
     RemoveStack = "${params.RemovePreviousVersion}"
-    StackName = "${params.StackName}"
+    StackName = 'aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,\'ECS-task-\')].[StackName]" | tail -1'
   }
   stages {
     stage("Update ALB stack") {

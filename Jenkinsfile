@@ -34,12 +34,6 @@ pipeline {
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
   stages {
-    stage("Preparation"){
-      steps {	
-         sh 'echo Build Preparation'
-         checkout scm
-      }
-    }
     stage("Versioning"){
       when { environment name: 'SetNewTag', value: 'true' }
       steps {
