@@ -211,8 +211,16 @@ pipeline {
               UnicId = "${Tag}".replaceAll("\\.", "-")
               sh """
                  CurrentStack=\$(aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" --region us-east-1 | tail -1)
-                 DeploymentColor=\$(aws cloudformation describe-stacks --stack-name \$CurrentStack --query "Stacks[].Parameters[?ParameterKey=='DeploymentColor'].ParameterValue" --output text --region us-east-1)
-                 aws cloudformation deploy --stack-name ECS-task-${UnicId} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} ServiceName=snakes-${UnicId} DeploymentColor=\$DeploymentColor --capabilities CAPABILITY_IAM --region us-east-1
+                 CurrentDeploymentColor=\$(aws cloudformation describe-stacks --stack-name \$CurrentStack --query "Stacks[].Parameters[?ParameterKey=='DeploymentColor'].ParameterValue" --output text --region us-east-1)
+                 NewDeploymentColor="Green"
+                 if [ ${CurrentDeploymentColor} == "Green" ]
+                     then
+                         NewDeploymentColor="Blue"
+                 fi
+                 aws cloudformation deploy --stack-name ECS-task-${UnicId} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} ServiceName=snakes-${UnicId} DeploymentColor=\$NewDeploymentColor --capabilities CAPABILITY_IAM --region us-east-1
+                 echo "CurrentStack           = \$CurrentStack"
+                 echo "CurrentDeploymentColor = \$CurrentDeploymentColor"
+                 echo "NewDeploymentColor     = \$NewDeploymentColor"
                  """
             }
             currentBuild.result = 'SUCCESS'
