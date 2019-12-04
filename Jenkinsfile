@@ -90,7 +90,6 @@ pipeline {
       steps {
         script {
           try {
-            echo "${CurrentStack} : ${DeploymentColor}"
             sh 'cd eb-tomcat-snakes && ./build.sh'
             currentBuild.result = 'SUCCESS'
           }
