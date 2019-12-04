@@ -17,7 +17,7 @@ pipeline {
     booleanParam(name: 'Deployment', defaultValue: false, description: '')
     booleanParam(name: 'SetNewTag', defaultValue: false, description: 'TAG git commit and docker image')
     choice(name: 'Version', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
-    choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
+    // choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -29,7 +29,8 @@ pipeline {
     Deployment = "${params.Deployment}"
     Tag = '0.0.0'
     ChoiceResult = "${params.Version}"
-    DeploymentColor = "${params.DeploymentColor}"
+    CurrentStack = sh(script: '''aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" --region us-east-1 | tail -1''', returnStdout: true)
+    DeploymentColor = sh(script: "aws cloudformation describe-stacks --stack-name ${CurrentStack} --query '''Stacks[].Parameters[?ParameterKey=='DeploymentColor'].ParameterValue''' --output text --region us-east-1", returnStdout: true)
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
@@ -38,6 +39,7 @@ pipeline {
       when { environment name: 'SetNewTag', value: 'true' }
       steps {
         script {
+            echo "${CurrentStack} : ${DeploymentColor}"
             sh ''' echo "Executing Tagging"
             version=\$(git describe --tags `git rev-list --tags --max-count=1`)
             FirstSet=\$(echo \$version | cut -d '.' -f 1)
