@@ -23,7 +23,6 @@ pipeline {
     BlueWeight = "${params.BlueWeight}"
     GreenWeight = "${params.GreenWeight}"
     RemoveStack = "${params.RemovePreviousVersion}"
-    StackName = /aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" | tail -1/
   }
   stages {
     stage("Update ALB stack") {
@@ -54,6 +53,7 @@ pipeline {
         script {
           try {
             dir("${OPSRepoBranch}") {
+              StackName = sh /aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" | tail -1/
               sh "aws cloudformation delete-stack --stack-name ${StackName} --region us-east-1"
             }
             currentBuild.result = 'SUCCESS'
