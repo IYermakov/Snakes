@@ -55,7 +55,6 @@ pipeline {
           try {
             dir("${OPSRepoBranch}") {
               sh "echo $StackName"
-              echo ${StackName}
               sh "aws cloudformation delete-stack --stack-name $StackName --region us-east-1"
               sh "aws cloudformation delete-stack --stack-name ${StackName} --region us-east-1"
             }
