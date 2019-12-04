@@ -15,7 +15,7 @@ pipeline {
     booleanParam(name: 'Build', defaultValue: true, description: '')
     booleanParam(name: 'Release', defaultValue: false, description: '')
     booleanParam(name: 'Deployment', defaultValue: false, description: '')
-    booleanParam(name: 'SetNewTag', defaultValue: false, description: 'TAG git commit and docker image')	    choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
+    booleanParam(name: 'SetNewTag', defaultValue: false, description: 'TAG git commit and docker image')
     choice(name: 'Version', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
     choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
   }
@@ -27,8 +27,7 @@ pipeline {
     BuildAndTest = "${params.Build}"
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
-    Tag = ""
-    Result = '0.0.0'
+    Tag = '0.0.0'
     ChoiceResult = "${params.Version}"
     DeploymentColor = "${params.DeploymentColor}"
     Email = 'vecinomio@gmail.com'
@@ -73,17 +72,15 @@ pipeline {
             echo Increased: A=\$A, B=\$B, C=\$C
             '''
             nextVersion = readFile 'outFile'
-            Result = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
-            echo "We will --tag '${Result}'"
+            Tag = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
+            echo "We will --tag '${Tag}'"
         }
       }
     }
     stage("Condition") {
       steps {
         script {
-          if (Release == 'true') {
-            Tag = "${Result}"
-          } else {
+          if (Release == 'false') {
             Tag = "${BRANCH_NAME}-${BUILD_NUMBER}"
           }
         }
