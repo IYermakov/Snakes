@@ -29,10 +29,6 @@ pipeline {
     Deployment = "${params.Deployment}"
     Tag = '0.0.0'
     ChoiceResult = "${params.Version}"
-    DeploymentColor = sh(script:
-                      '''CurrentStack=$(aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" --region us-east-1 | tail -1)
-                      aws cloudformation describe-stacks --stack-name $CurrentStack --query "Stacks[].Parameters[?ParameterKey=='DeploymentColor'].ParameterValue" --output text --region us-east-1''',
-                      returnStdout: true)
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
@@ -214,7 +210,9 @@ pipeline {
           try {
             dir("${OPSRepoBranch}") {
               UnicId = "${Tag}".replaceAll("\\.", "-")
-              sh "aws cloudformation deploy --stack-name ECS-task-${UnicId} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} ServiceName=snakes-${UnicId} DeploymentColor=${DeploymentColor} --capabilities CAPABILITY_IAM --region us-east-1"
+              sh '''CurrentStack=$(aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" --region us-east-1 | tail -1)
+                 aws cloudformation describe-stacks --stack-name $CurrentStack --query "Stacks[].Parameters[?ParameterKey=='DeploymentColor'].ParameterValue" --output text --region us-east-1
+                 aws cloudformation deploy --stack-name ECS-task-${UnicId} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} ServiceName=snakes-${UnicId} DeploymentColor=${DeploymentColor} --capabilities CAPABILITY_IAM --region us-east-1'''
             }
             currentBuild.result = 'SUCCESS'
             emailext body: 'Application was successfully deployed to ECS.', subject: "JOB with identifier ${Tag} SUCCESS", to: "${Email}"
