@@ -11,16 +11,16 @@ pipeline {
     timestamps()
   }
   parameters {
-    // string(defaultValue: '0.0.0', description: 'A version of Release', name: 'VERSION')
-    booleanParam(name: 'Build', defaultValue: true, description: '')
-    booleanParam(name: 'Release', defaultValue: false, description: '')
-    booleanParam(name: 'Deployment', defaultValue: false, description: '')
-    booleanParam(name: 'SetNewTag', defaultValue: false, description: 'TAG git commit and docker image')
-    choice(name: 'Version', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
-    choice(name: 'DeploymentColor', choices: ['Blue', 'Green'], description: '')
+    booleanParam(name: 'Build', defaultValue: true, description: 'Includes Build app and Tests')
+    booleanParam(name: 'Release', defaultValue: false, description: 'Includes Tagging and Delivery')
+    booleanParam(name: 'Deployment', defaultValue: false, description: 'Deploy a new version of App')
+    booleanParam(name: 'SetNewTag', defaultValue: false, description: 'Auto-increasing version')
+    choice(name: 'AppVersion', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
+    choice(name: 'NewVersionTrafficWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Amount of traffic to the new vesion of the App')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
+    AWSRegion = 'us-east-1'
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'weighted-tgs'
@@ -29,22 +29,17 @@ pipeline {
     Deployment = "${params.Deployment}"
     Tag = '0.0.0'
     ChoiceResult = "${params.Version}"
-    DeploymentColor = "${params.DeploymentColor}"
+    CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
   stages {
-    stage("Preparation"){
-      steps {	
-         sh 'echo Build Preparation'
-         checkout scm
-      }
-    }
     stage("Versioning"){
       when { environment name: 'SetNewTag', value: 'true' }
       steps {
         script {
-            sh ''' echo "Executing Tagging"
+            sh """ echo "Executing Tagging"
+            version=${Tag}
             version=\$(git describe --tags `git rev-list --tags --max-count=1`)
             FirstSet=\$(echo \$version | cut -d '.' -f 1)
             if [ \${#FirstSet} -ge 2 ];
@@ -76,7 +71,7 @@ pipeline {
             fi
             echo "[\$Prefix-\$A.\$B.\$C]" > outFile
             echo Increased: A=\$A, B=\$B, C=\$C
-            '''
+            """
             nextVersion = readFile 'outFile'
             Tag = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
             echo "We will --tag '${Tag}'"
@@ -156,7 +151,7 @@ pipeline {
       steps {
         script {
           try {
-            sh '$(aws ecr get-login --no-include-email --region us-east-1)'
+            sh '$(aws ecr get-login --no-include-email --region ${AWSRegion})'
             docker.withRegistry("https://${ECRURI}") {
               dockerImage.push()
             }
@@ -216,7 +211,17 @@ pipeline {
           try {
             dir("${OPSRepoBranch}") {
               UnicId = "${Tag}".replaceAll("\\.", "-")
-              sh "aws cloudformation deploy --stack-name ECS-task-${UnicId} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} ServiceName=snakes-${UnicId} DeploymentColor=${DeploymentColor} --capabilities CAPABILITY_IAM --region us-east-1"
+              sh """
+                 CurrentStack=\$(aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task')].[StackName]" --region ${AWSRegion} | tail -1)
+                 CurrentDeploymentColor=\$(aws cloudformation describe-stacks --stack-name \$CurrentStack --query "Stacks[].Parameters[?ParameterKey=='DeploymentColor'].ParameterValue" --output text --region ${AWSRegion} | tail -1)
+                 NewDeploymentColor="Green"
+                 if [ \$CurrentDeploymentColor == "Green" ]
+                     then
+                         NewDeploymentColor="Blue"
+                 fi
+                 aws cloudformation deploy --stack-name ECS-task-${UnicId} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} ServiceName=snakes-${UnicId} DeploymentColor=\$NewDeploymentColor --capabilities CAPABILITY_IAM --region ${AWSRegion}
+                 aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides VPCStackName=DevVPC \${CurrentDeploymentColor}Weight=${CurrentVersionTrafficWeight} \${NewDeploymentColor}Weight=${NewVersionTrafficWeight} --capabilities CAPABILITY_IAM --region us-east-1
+                 """
             }
             currentBuild.result = 'SUCCESS'
             emailext body: 'Application was successfully deployed to ECS.', subject: "JOB with identifier ${Tag} SUCCESS", to: "${Email}"
