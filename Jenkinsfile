@@ -29,7 +29,7 @@ pipeline {
     Deployment = "${params.Deployment}"
     Tag = '0.0.0'
     ChoiceResult = "${params.Version}"
-    CurrentVersionTrafficWeight = (10 - "${params.NewVersionWeight}".toInteger()).toString()
+    CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
     Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
