@@ -44,7 +44,7 @@ pipeline {
             FirstSet=\$(echo \$version | cut -d '.' -f 1)
             if [ \${#FirstSet} -ge 2 ];
                 then
-                    Prefix=\$(echo \$FirstSet | cut -d '-' -f 1)
+                    Prefix=\$(echo \$FirstSet | cut -d '-' -f 1)-
                     A=\$(echo \$FirstSet | cut -d '-' -f 2)
                 else
                     Prefix=""
@@ -69,7 +69,7 @@ pipeline {
                     C=\$((C+1))
                     echo "Executing Minor"
             fi
-            echo "[\$Prefix-\$A.\$B.\$C]" > outFile
+            echo "[\$Prefix\$A.\$B.\$C]" > outFile
             echo Increased: A=\$A, B=\$B, C=\$C
             """
             nextVersion = readFile 'outFile'
