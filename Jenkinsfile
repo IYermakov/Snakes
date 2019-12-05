@@ -11,12 +11,13 @@ pipeline {
     timestamps()
   }
   parameters {
-    // string(defaultValue: '0.0.0', description: 'A version of Release', name: 'VERSION')
     booleanParam(name: 'Build', defaultValue: true, description: '')
     booleanParam(name: 'Release', defaultValue: false, description: '')
     booleanParam(name: 'Deployment', defaultValue: false, description: '')
     booleanParam(name: 'SetNewTag', defaultValue: false, description: 'TAG git commit and docker image')
     choice(name: 'Version', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
+    choice(name: 'CurrentVersionWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: '')
+    choice(name: 'NewVersionWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: '')
   }
   environment {
     ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
@@ -219,9 +220,7 @@ pipeline {
                          NewDeploymentColor="Blue"
                  fi
                  aws cloudformation deploy --stack-name ECS-task-${UnicId} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} ServiceName=snakes-${UnicId} DeploymentColor=\$NewDeploymentColor --capabilities CAPABILITY_IAM --region ${AWSRegion}
-                 echo "CurrentStack           = \$CurrentStack"
-                 echo "CurrentDeploymentColor = \$CurrentDeploymentColor"
-                 echo "NewDeploymentColor     = \$NewDeploymentColor"
+                 aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides VPCStackName=DevVPC ${CurrentDeploymentColor}Weight=${CurrentVersionWeight} ${NewDeploymentColor}Weight=${NewVersionWeight} --capabilities CAPABILITY_IAM --region us-east-1
                  """
             }
             currentBuild.result = 'SUCCESS'
