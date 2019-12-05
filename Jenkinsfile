@@ -39,7 +39,7 @@ pipeline {
       steps {
         script {
             sh """ echo "Executing Tagging"
-            version=\$(git describe --tags `git rev-list --tags --max-count=1` || ${Tag})
+            version=\$(git describe --tags `git rev-list --tags --max-count=1` || echo ${Tag})
             FirstSet=\$(echo \$version | cut -d '.' -f 1)
             if [ \${#FirstSet} -ge 2 ];
                 then
