@@ -23,7 +23,7 @@ pipeline {
     BlueWeight = "${params.BlueWeight}"
     GreenWeight = "${params.GreenWeight}"
     RemoveStack = "${params.RemovePreviousVersion}"
-    StackToRemove = sh(script: '''aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" --region us-east-1 | tail -1''', returnStdout: true)
+    StackToRemove = sh(script: '''aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task')].[StackName]" --region us-east-1 | tail -1''', returnStdout: true)
   }
   stages {
     stage("Update ALB stack") {
