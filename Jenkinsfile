@@ -37,7 +37,8 @@ pipeline {
       when { environment name: 'SetNewTag', value: 'true' }
       steps {
         script {
-            sh ''' echo "Executing Tagging"
+            sh """ echo "Executing Tagging"
+            version=${Tag}
             version=\$(git describe --tags `git rev-list --tags --max-count=1`)
             FirstSet=\$(echo \$version | cut -d '.' -f 1)
             if [ \${#FirstSet} -ge 2 ];
@@ -69,7 +70,7 @@ pipeline {
             fi
             echo "[\$Prefix-\$A.\$B.\$C]" > outFile
             echo Increased: A=\$A, B=\$B, C=\$C
-            '''
+            """
             nextVersion = readFile 'outFile'
             Tag = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
             echo "We will --tag '${Tag}'"
@@ -210,7 +211,7 @@ pipeline {
             dir("${OPSRepoBranch}") {
               UnicId = "${Tag}".replaceAll("\\.", "-")
               sh """
-                 CurrentStack=\$(aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task-')].[StackName]" --region ${AWSRegion} | tail -1)
+                 CurrentStack=\$(aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task')].[StackName]" --region ${AWSRegion} | tail -1)
                  CurrentDeploymentColor=\$(aws cloudformation describe-stacks --stack-name \$CurrentStack --query "Stacks[].Parameters[?ParameterKey=='DeploymentColor'].ParameterValue" --output text --region ${AWSRegion} | tail -1)
                  NewDeploymentColor="Green"
                  if [ \$CurrentDeploymentColor == "Green" ]
