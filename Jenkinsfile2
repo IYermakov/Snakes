@@ -65,7 +65,7 @@ pipeline {
                         GreenWeight="1"
                         BlueWeight="0"
                 fi
-                aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides VPCStackName=DevVPC BlueWeight=\$BlueWeight GreenWeight=\$GreenWeight  --capabilities CAPABILITY_IAM --region ${AWSRegion}
+                aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides VPCStackName=DevVPC BlueWeight=\$BlueWeight GreenWeight=\$GreenWeight  --capabilities CAPABILITY_IAM --region ${AWSRegion}  || echo "Stack ALB updating FAILURE. Continue to delete stack..."
                 aws cloudformation delete-stack --stack-name \$StackToRemove --region ${AWSRegion}
                 """
             }
