@@ -30,15 +30,17 @@ pipeline {
     Tag = '1.0.0'
     ChoiceResult = "${params.Version}"
     CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
-    Email = 'vecinomio@gmail.com'
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
+    Email = 'vecinomio@gmail.com'
+    FailureEmailSubject = "JOB with identifier ${Tag} FAILED"
+    SuccessEmailSubject = "JOB with identifier ${Tag} SUCCESS"
   }
   stages {
     stage("Versioning"){
       when { environment name: 'SetNewTag', value: 'true' }
       steps {
         script {
-            sh """ echo "Executing Tagging"
+            sh """
             version=\$(git describe --tags `git rev-list --tags --max-count=1` || echo ${Tag})
             FirstSet=\$(echo \$version | cut -d '.' -f 1)
             if [ \${#FirstSet} -ge 2 ];
@@ -73,7 +75,6 @@ pipeline {
             """
             nextVersion = readFile 'outFile'
             Tag = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
-            echo "We will --tag '${Tag}'"
         }
       }
     }
@@ -96,7 +97,7 @@ pipeline {
           }
           catch (err) {
             currentBuild.result = 'FAILURE'
-            emailext body: "${err}. Build Application Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            emailext body: "${err}. Build Application Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
             throw (err)
           }
           echo "result is: ${currentBuild.currentResult}"
@@ -114,7 +115,7 @@ pipeline {
           catch (err) {
             sh "${DelUnusedImage}"
             currentBuild.result = 'FAILURE'
-            emailext body: "${err}. Build Docker Image Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            emailext body: "${err}. Build Docker Image Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
             throw (err)
           }
           echo "result is: ${currentBuild.currentResult}"
@@ -126,12 +127,9 @@ pipeline {
       steps {
         script {
           try {
-            echo "======== Start Docker Container ========"
             testContainer = dockerImage.run('-p 8090:8080 --name test')
-            echo "======== Check Access ========="
             sh 'sleep 10'
             sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
-            echo "======== Disable and Remove Container ========="
             testContainer.stop()
             currentBuild.result = 'SUCCESS'
           }
@@ -139,7 +137,7 @@ pipeline {
             testContainer.stop()
             sh "${DelUnusedImage}"
             currentBuild.result = 'FAILURE'
-            emailext body: "${err}. Test Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            emailext body: "${err}. Test Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
             throw (err)
           }
         }
@@ -155,12 +153,12 @@ pipeline {
               dockerImage.push()
             }
             currentBuild.result = 'SUCCESS'
-            emailext body: 'Docker Image was successfully delivered to ECR.', subject: "JOB with identifier ${Tag} SUCCESS", to: "${Email}"
+            emailext body: 'Docker Image was successfully delivered to ECR.', subject: "${SuccessEmailSubject}", to: "${Email}"
           }
           catch (err) {
             sh "${DelUnusedImage}"
             currentBuild.result = 'FAILURE'
-            emailext body: "${err}. Delivery to ECR Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            emailext body: "${err}. Delivery to ECR Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
             throw (err)
           }
           echo "result is: ${currentBuild.currentResult}"
@@ -187,9 +185,9 @@ pipeline {
           }
           catch (err) {
             sh "${DelUnusedImage}"
-            sh "pwd && rm -rf ${OPSRepoBranch}"
+            sh "rm -rf ${OPSRepoBranch}"
             currentBuild.result = 'FAILURE'
-            emailext body: "${err}. Tagging Stage Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            emailext body: "${err}. Tagging Stage Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
             throw (err)
           }
           echo "result is: ${currentBuild.currentResult}"
@@ -198,7 +196,6 @@ pipeline {
     }
     stage("CleanUp") {
       steps {
-        echo "====================== Removing images ====================="
         sh "${DelUnusedImage}"
         sh 'docker images'
       }
@@ -219,15 +216,15 @@ pipeline {
                          NewDeploymentColor="Blue"
                  fi
                  aws cloudformation deploy --stack-name ECS-task-${UnicId} --template-file ops/cloudformation/ECS/ecs-task.yml --parameter-overrides ImageUrl=${ECRURI}/${AppRepoName}:${Tag} ServiceName=snakes-${UnicId} DeploymentColor=\$NewDeploymentColor --capabilities CAPABILITY_IAM --region ${AWSRegion}
-                 aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides VPCStackName=DevVPC \${CurrentDeploymentColor}Weight=${CurrentVersionTrafficWeight} \${NewDeploymentColor}Weight=${NewVersionTrafficWeight} --capabilities CAPABILITY_IAM --region us-east-1
+                 aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides VPCStackName=DevVPC \${CurrentDeploymentColor}Weight=${CurrentVersionTrafficWeight} \${NewDeploymentColor}Weight=${NewVersionTrafficWeight} --capabilities CAPABILITY_IAM --region ${AWSRegion}
                  """
             }
             currentBuild.result = 'SUCCESS'
-            emailext body: 'Application was successfully deployed to ECS.', subject: "JOB with identifier ${Tag} SUCCESS", to: "${Email}"
+            emailext body: 'New release was successfully deployed to ECS.', subject: "${SuccessEmailSubject}", to: "${Email}"
           }
           catch (err) {
             currentBuild.result = 'FAILURE'
-            emailext body: "${err}. ECS Stack Creation Failed, check logs.", subject: "JOB with identifier ${Tag} FAILED", to: "${Email}"
+            emailext body: "${err}. ECS Stack Creation Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
             throw (err)
           }
           echo "result is: ${currentBuild.currentResult}"
