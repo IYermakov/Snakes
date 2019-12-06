@@ -143,7 +143,7 @@ pipeline {
         }
       }
     }
-    stage("Push artifact to ECR") {
+    stage("Delivery") {
       when { environment name: 'Release', value: 'true' }
       steps {
         script {
@@ -153,7 +153,6 @@ pipeline {
               dockerImage.push()
             }
             currentBuild.result = 'SUCCESS'
-            emailext body: 'Docker Image was successfully delivered to ECR.', subject: "${SuccessEmailSubject}", to: "${Email}"
           }
           catch (err) {
             sh "${DelUnusedImage}"
@@ -197,10 +196,9 @@ pipeline {
     stage("CleanUp") {
       steps {
         sh "${DelUnusedImage}"
-        sh 'docker images'
       }
     }
-    stage("Create stack on ECS") {
+    stage("Deployment") {
       when { environment name: 'Deployment', value: 'true' }
       steps {
         script {
