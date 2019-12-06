@@ -27,7 +27,7 @@ pipeline {
     BuildAndTest = "${params.Build}"
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
-    Tag = '0.0.0'
+    Tag = '1.0.0'
     ChoiceResult = "${params.Version}"
     CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
     Email = 'vecinomio@gmail.com'
@@ -81,7 +81,7 @@ pipeline {
       steps {
         script {
           if (Release == 'false') {
-            Tag = "${BRANCH_NAME}-${BUILD_NUMBER}"
+            Tag = "${JOB_NAME}-${BUILD_NUMBER}"
           }
         }
       }
