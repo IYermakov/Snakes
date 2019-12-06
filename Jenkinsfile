@@ -81,7 +81,7 @@ pipeline {
       steps {
         script {
           if (Release == 'false') {
-            Tag = "${JOB_NAME}-${BUILD_NUMBER}"
+            Tag = "${BUILD_NUMBER}"
           }
         }
       }
