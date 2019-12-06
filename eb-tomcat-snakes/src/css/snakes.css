@@ -16,7 +16,7 @@
 html,
 body {
   height: 100%;
-  background-color: blue;
+  background-color: rgba(204,255,153);
   /* background-color: rgba(255,255,200,1); */
 }
 
