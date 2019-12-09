@@ -52,7 +52,7 @@ pipeline {
       ], name: 'AWSRegion', description: 'Choose the desired AWS region'
     )
     booleanParam(name: 'Build', defaultValue: true, description: 'Specify to Build App and do Tests')
-    booleanParam(name: 'Release', defaultValue: false, description: 'Specify to deliver artifact and tags to the repos')
+    booleanParam(name: 'Release', defaultValue: false, description: 'Specify to deliver an artifact to ECR and tags to Github repos')
     booleanParam(name: 'Deployment', defaultValue: false, description: 'Specify to Deploy a new version of App to ECS')
     choice(name: 'NewVersionTrafficWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Choose amount of traffic to the new vesion of the App')
   }
