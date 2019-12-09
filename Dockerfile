@@ -6,7 +6,7 @@ LABEL maintainer="devopsa3"
 RUN apk add openjdk8 curl
 
 RUN cd /usr/local/ \
-  && wget http://apache.volia.net/tomcat/tomcat-8/v8.5.49/bin/apache-tomcat-8.5.49.tar.gz \
+  && wget http://apache.ip-connect.vn.ua/tomcat/tomcat-9/v9.0.29/bin/apache-tomcat-9.0.29.tar.gz \
   && tar xzf apache-tomcat-8.5.49.tar.gz \
   && mv apache-tomcat-8.5.49/ tomcat/ \
   && rm apache-tomcat-8.5.49.tar.gz
