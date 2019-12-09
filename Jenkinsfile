@@ -65,7 +65,7 @@ pipeline {
     BuildAndTest = "${params.Build}"
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
-    Tag = "${params.NewRelease}"
+    Tag = "${params.Current Release \nis: ${LastRelease}}"
     CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
     Email = "${params.Email}"
     FailureEmailSubject = "JOB with identifier ${Tag} FAILED"
