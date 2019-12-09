@@ -7,7 +7,7 @@ def RemoveUnusedImages() {
 }
 node {
   LastRelease = sh (script: "git describe --tags `git rev-list --tags --max-count=1`", returnStdout: true).trim()
-  NewRelease = (LastRelease.toInteger() + 0.0.1).toString()
+  NewRelease = (LastRelease.toInteger() + 1).toString()
 }
 pipeline {
   agent {
