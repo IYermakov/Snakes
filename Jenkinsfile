@@ -5,7 +5,7 @@ properties([disableConcurrentBuilds()])
 def RemoveUnusedImages() {
   sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
 }
-
+StartVersionFrom = '1.0.0'
 pipeline {
   agent {
     label 'master'
@@ -15,7 +15,6 @@ pipeline {
     timestamps()
   }
   parameters {
-    StartVersionFrom = '1.0.0'
     string(name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Enter the desired AWS region')
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
