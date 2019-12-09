@@ -40,8 +40,8 @@ pipeline {
     timestamps()
   }
   parameters {
-    string(name: 'CurrentRelease', defaultValue: "${LastRelease}", description: 'Version of the last release')
-    string(name: 'NewRelease', defaultValue: "${NewRelease}", description: 'New release will be')
+    // string(name: 'CurrentRelease', defaultValue: "${LastRelease}", description: 'Version of the last release')
+    string(name: 'NewRelease', defaultValue: "${NewRelease}", description: "Current Release is: ${LastRelease}")
     string(name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Enter the desired AWS region')
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
