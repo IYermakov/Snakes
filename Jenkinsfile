@@ -15,7 +15,7 @@ pipeline {
     timestamps()
   }
   parameters {
-    string(name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Enter the desired region')
+    string(name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Enter the desired AWS region')
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
     booleanParam(name: 'Build', defaultValue: true, description: 'Includes Build app and Tests')
@@ -37,7 +37,6 @@ pipeline {
     StartVersionFrom = '1.0.0'
     ChoiceResult = "${params.Version}"
     CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
-    DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
     Email = "${params.Email}"
     FailureEmailSubject = "JOB with identifier ${Tag} FAILED"
     SuccessEmailSubject = "JOB with identifier ${Tag} SUCCESS"
