@@ -7,7 +7,7 @@ def RemoveUnusedImages() {
 }
 
 node {
-  StartVersionFrom = '0.0.1'
+  StartVersionFrom = '0.0.0'
   LastRelease = sh (script: "git describe --tags `git rev-list --tags --max-count=1` || echo ${StartVersionFrom}", returnStdout: true).trim()
   sh (script:
     """
