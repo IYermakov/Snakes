@@ -33,6 +33,9 @@ pipeline {
     StartVersionFrom = '1.0.0'
     ChoiceResult = "${params.Version}"
     CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
+    def RemoveUnusedImages() {
+      sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
+    }
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
     Email = "${params.Email}"
     FailureEmailSubject = "JOB with identifier ${Tag} FAILED"
@@ -116,7 +119,7 @@ pipeline {
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
-            sh "${DelUnusedImage}"
+            RemoveUnusedImages()
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Build Docker Image Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
             throw (err)
@@ -138,7 +141,7 @@ pipeline {
           }
           catch (err) {
             testContainer.stop()
-            sh "${DelUnusedImage}"
+            RemoveUnusedImages()
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Test Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
             throw (err)
@@ -158,7 +161,7 @@ pipeline {
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
-            sh "${DelUnusedImage}"
+            RemoveUnusedImages()
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Delivery to ECR Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
             throw (err)
@@ -186,7 +189,7 @@ pipeline {
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
-            sh "${DelUnusedImage}"
+            RemoveUnusedImages()
             sh "rm -rf ${OPSRepoBranch}"
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Tagging Stage Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
@@ -198,7 +201,7 @@ pipeline {
     }
     stage("CleanUp") {
       steps {
-        sh "${DelUnusedImage}"
+        RemoveUnusedImages()
       }
     }
     stage("Deployment") {
