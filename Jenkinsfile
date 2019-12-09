@@ -1,38 +1,13 @@
 #!groovy
 //Only one build can run
-// properties([disableConcurrentBuilds()])
-properties([
-    parameters([
-        [
-            $class: 'ChoiceParameter',
-            choiceType: 'PT_SINGLE_SELECT',
-            description: '',
-            filterable: false,
-            name: 'Release',
-            randomName: 'choice-parameter-21337077649621572',
-            script: [
-                $class: 'GroovyScript',
-                fallbackScript: '',
-                script: '''// Find relevant AMIs based on their name
-                    def sout = new StringBuffer(), serr = new StringBuffer()
-                    def proc = '/usr/bin/aws --region eu-west-1 ec2 describe-images \
-                            ' --owners OWNER --filter Name=name,Values=PATTERN \
-                            ' --query Images[*].{AMI:Name} --output  text'.execute()
-                    proc.consumeProcessOutput(sout, serr)
-                    proc.waitForOrKill(10000)
-                    return sout.tokenize()'''
-            ]
-        ]
-    ])
-])
+properties([disableConcurrentBuilds()])
 
 def RemoveUnusedImages() {
   sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
 }
-// def LastTag() {
-//   return $(sh "pwd")
-// }
-
+node {
+  LastTag = sh (script: 'pwd', returnStdout: true).trim()
+}
 pipeline {
   agent {
     label 'master'
@@ -45,7 +20,7 @@ pipeline {
     string(name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Enter the desired AWS region')
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
-    string(name: 'SetNewTag', defaultValue: "", description: 'New tag will be')
+    string(name: 'SetNewTag', defaultValue: "${LastTag}", description: 'New tag will be')
     booleanParam(name: 'Build', defaultValue: true, description: 'Includes Build app and Tests')
     booleanParam(name: 'Release', defaultValue: false, description: 'Includes Tagging and Delivery')
     booleanParam(name: 'Deployment', defaultValue: false, description: 'Deploy a new version of App')
