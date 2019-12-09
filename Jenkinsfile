@@ -40,8 +40,7 @@ pipeline {
     timestamps()
   }
   parameters {
-    //string(name: 'CurrentRelease', defaultValue: "${LastRelease}", description: 'Version of the last release')
-    string(name: "Current Release is: ${LastRelease}", defaultValue: "${NewRelease}", description: "New Release will be:")
+    string(name: "Current Release is: \n${LastRelease}", defaultValue: "${NewRelease}", description: "New Release will be:")
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
     choice(
@@ -50,7 +49,7 @@ pipeline {
         'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1', 'ap-northeast-2', 'ap-northeast-3',
         'ca-central-1', 'cn-north-1', 'cn-northwest-1', 'eu-central-1', 'eu-west-1', 'eu-west-2',
         'eu-west-3', 'eu-north-1', 'me-south-1', 'sa-east-1'
-      ], name: 'AWSRegion', description: 'Enter the desired AWS region'
+      ], name: 'AWSRegion', description: 'Choose the desired AWS region'
     )
     booleanParam(name: 'Build', defaultValue: true, description: 'Includes Build app and Tests')
     booleanParam(name: 'Release', defaultValue: false, description: 'Includes Tagging and Delivery')
