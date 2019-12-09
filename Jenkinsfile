@@ -7,7 +7,26 @@ def RemoveUnusedImages() {
 }
 node {
   LastRelease = sh (script: "git describe --tags `git rev-list --tags --max-count=1`", returnStdout: true).trim()
-  NewRelease = (LastRelease.toInteger() + 1).toString()
+  sh (script:
+    """
+    FirstSet=\$(echo ${LastRelease} | cut -d '.' -f 1)
+    if [ \${#FirstSet} -ge 2 ];
+        then
+            Prefix=\$(echo \$FirstSet | cut -d '-' -f 1)-
+            A=\$(echo \$FirstSet | cut -d '-' -f 2)
+        else
+            Prefix=""
+            A=\$FirstSet
+    fi
+    B=\$(echo ${LastRelease} | cut -d '.' -f 2)
+    C=\$(echo ${LastRelease} | cut -d '.' -f 3)
+    echo " *** ORIGIN VERSION A=\$A, B=\$B, C=\$C *** "
+    echo "[\$Prefix\$A.\$B.\$((C+1))]" > outFile
+    echo Increased: A=\$A, B=\$B, C=\$C
+    """
+  )
+  nextVersion = readFile 'outFile'
+  NewRelease = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
 }
 pipeline {
   agent {
@@ -49,48 +68,48 @@ pipeline {
   }
 
   stages {
-    // stage("Versioning"){
-    //   when { environment name: 'SetNewTag', value: 'true' }
-    //   steps {
-    //     script {
-    //         sh """
-    //         version=\$(git describe --tags `git rev-list --tags --max-count=1` || echo ${StartVersionFrom})
-    //         FirstSet=\$(echo \$version | cut -d '.' -f 1)
-    //         if [ \${#FirstSet} -ge 2 ];
-    //             then
-    //                 Prefix=\$(echo \$FirstSet | cut -d '-' -f 1)-
-    //                 A=\$(echo \$FirstSet | cut -d '-' -f 2)
-    //             else
-    //                 Prefix=""
-    //                 A=\$FirstSet
-    //         fi
-    //         B=\$(echo \$version | cut -d '.' -f 2)
-    //         C=\$(echo \$version | cut -d '.' -f 3)
-    //         echo " *** ORIGIN VERSION A=\$A, B=\$B, C=\$C *** "
-    //         if [ ${ChoiceResult} == "Major" ]
-    //             then
-    //                 A=\$((A+1))
-    //                 B=0
-    //                 C=0
-    //                 echo "Executing Major"
-    //         fi
-    //         if [ ${ChoiceResult} == "Middle" ]
-    //             then
-    //                 B=\$((B+1))
-    //                 C=0
-    //                 echo "Executing Middle"
-    //             else
-    //                 C=\$((C+1))
-    //                 echo "Executing Minor"
-    //         fi
-    //         echo "[\$Prefix\$A.\$B.\$C]" > outFile
-    //         echo Increased: A=\$A, B=\$B, C=\$C
-    //         """
-    //         nextVersion = readFile 'outFile'
-    //         Tag = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
-    //     }
-    //   }
-    // }
+    stage("Versioning"){
+      when { environment name: 'SetNewTag', value: 'true' }
+      steps {
+        script {
+            sh """
+            version=\$(git describe --tags `git rev-list --tags --max-count=1` || echo ${StartVersionFrom})
+            FirstSet=\$(echo \$version | cut -d '.' -f 1)
+            if [ \${#FirstSet} -ge 2 ];
+                then
+                    Prefix=\$(echo \$FirstSet | cut -d '-' -f 1)-
+                    A=\$(echo \$FirstSet | cut -d '-' -f 2)
+                else
+                    Prefix=""
+                    A=\$FirstSet
+            fi
+            B=\$(echo \$version | cut -d '.' -f 2)
+            C=\$(echo \$version | cut -d '.' -f 3)
+            echo " *** ORIGIN VERSION A=\$A, B=\$B, C=\$C *** "
+            if [ ${ChoiceResult} == "Major" ]
+                then
+                    A=\$((A+1))
+                    B=0
+                    C=0
+                    echo "Executing Major"
+            fi
+            if [ ${ChoiceResult} == "Middle" ]
+                then
+                    B=\$((B+1))
+                    C=0
+                    echo "Executing Middle"
+                else
+                    C=\$((C+1))
+                    echo "Executing Minor"
+            fi
+            echo "[\$Prefix\$A.\$B.\$C]" > outFile
+            echo Increased: A=\$A, B=\$B, C=\$C
+            """
+            nextVersion = readFile 'outFile'
+            Tag = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
+        }
+      }
+    }
     stage("Condition") {
       steps {
         script {
