@@ -6,7 +6,7 @@ def RemoveUnusedImages() {
   sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
 }
 def LastTag() {
-  Res = sh "git describe --tags `git rev-list --tags --max-count=1`"
+  Res = sh "pwd"
   return Res
 }
 pipeline {
