@@ -5,7 +5,7 @@ properties([disableConcurrentBuilds()])
 def RemoveUnusedImages() {
   sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
 }
-StartVersionFrom = 'git describe --tags `git rev-list --tags --max-count=1`
+StartVersionFrom = "git describe --tags `git rev-list --tags --max-count=1`"
 pipeline {
   agent {
     label 'master'
