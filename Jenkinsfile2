@@ -11,10 +11,10 @@ pipeline {
     timestamps()
   }
   parameters {
-    booleanParam(   name: 'UpdateALB', defaultValue: false, description: '')
-    choice(         name: 'BlueWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: '')
-    choice(         name: 'GreenWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: '')
-    booleanParam(   name: 'RemovePreviousVersion', defaultValue: false, description: '')
+    booleanParam(   name: 'UpdateALB', defaultValue: false, description: 'ALB TG weights will be updated unly if checkbox selected')
+    choice(         name: 'BlueWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Set the weight of ALB TG')
+    choice(         name: 'GreenWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Set the weight of ALB TG')
+    booleanParam(   name: 'RemovePreviousVersion', defaultValue: false, description: 'Remove outdated stack')
     string(         name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Desired region for AWS resources')
   }
   environment {
