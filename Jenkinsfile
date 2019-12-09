@@ -9,7 +9,7 @@ def RemoveUnusedImages() {
 node {
   StartVersionFrom = '0.0.1'
   LastRelease = sh (script: "git describe --tags `git rev-list --tags --max-count=1` || echo ${StartVersionFrom}", returnStdout: true).trim()
-  sh (script:
+  sh
     """
     FirstSet=\$(echo ${LastRelease} | cut -d '.' -f 1)
     if [ \${#FirstSet} -ge 2 ];
@@ -26,7 +26,6 @@ node {
     echo "[\$Prefix\$A.\$B.\$((C+1))]" > outFile
     echo Increased: A=\$A, B=\$B, C=\$C
     """
-  )
   nextVersion = readFile 'outFile'
   NewRelease = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
 }
@@ -65,7 +64,6 @@ pipeline {
     BuildAndTest = "${params.Build}"
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
-    StartVersionFrom = '0.0.1'
     Tag = "${params.NewRelease}"
     CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
     Email = "${params.Email}"
