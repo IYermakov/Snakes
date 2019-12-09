@@ -5,8 +5,10 @@ properties([disableConcurrentBuilds()])
 def RemoveUnusedImages() {
   sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
 }
+
 node {
-  LastRelease = sh (script: "git describe --tags `git rev-list --tags --max-count=1`", returnStdout: true).trim()
+  StartVersionFrom = '0.0.1'
+  LastRelease = sh (script: "git describe --tags `git rev-list --tags --max-count=1` || echo ${StartVersionFrom}", returnStdout: true).trim()
   sh (script:
     """
     FirstSet=\$(echo ${LastRelease} | cut -d '.' -f 1)
@@ -28,6 +30,7 @@ node {
   nextVersion = readFile 'outFile'
   NewRelease = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
 }
+
 pipeline {
   agent {
     label 'master'
@@ -37,16 +40,14 @@ pipeline {
     timestamps()
   }
   parameters {
+    string(name: 'CurrentRelease', defaultValue: "${LastRelease}", description: 'Version of the last release')
+    string(name: 'NewRelease', defaultValue: "${NewRelease}", description: 'New release will be')
     string(name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Enter the desired AWS region')
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
     booleanParam(name: 'Build', defaultValue: true, description: 'Includes Build app and Tests')
     booleanParam(name: 'Release', defaultValue: false, description: 'Includes Tagging and Delivery')
     booleanParam(name: 'Deployment', defaultValue: false, description: 'Deploy a new version of App')
-    // booleanParam(name: 'SetNewTag', defaultValue: false, description: 'Auto-increasing version')
-    string(name: 'CurrentRelease', defaultValue: "${LastRelease}", description: 'Version of the last release')
-    string(name: 'NewRelease', defaultValue: "${NewRelease}", description: 'Version of the new release')
-    // choice(name: 'AppVersion', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
     choice(name: 'NewVersionTrafficWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Amount of traffic to the new vesion of the App')
   }
   environment {
@@ -59,8 +60,7 @@ pipeline {
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
     StartVersionFrom = '0.0.1'
-    Tag = "${params.SetNewTag}"
-    // ChoiceResult = "${params.AppVersion}"
+    Tag = "${params.NewRelease}"
     CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
     Email = "${params.Email}"
     FailureEmailSubject = "JOB with identifier ${Tag} FAILED"
@@ -68,48 +68,6 @@ pipeline {
   }
 
   stages {
-    stage("Versioning"){
-      when { environment name: 'SetNewTag', value: 'true' }
-      steps {
-        script {
-            sh """
-            version=\$(git describe --tags `git rev-list --tags --max-count=1` || echo ${StartVersionFrom})
-            FirstSet=\$(echo \$version | cut -d '.' -f 1)
-            if [ \${#FirstSet} -ge 2 ];
-                then
-                    Prefix=\$(echo \$FirstSet | cut -d '-' -f 1)-
-                    A=\$(echo \$FirstSet | cut -d '-' -f 2)
-                else
-                    Prefix=""
-                    A=\$FirstSet
-            fi
-            B=\$(echo \$version | cut -d '.' -f 2)
-            C=\$(echo \$version | cut -d '.' -f 3)
-            echo " *** ORIGIN VERSION A=\$A, B=\$B, C=\$C *** "
-            if [ ${ChoiceResult} == "Major" ]
-                then
-                    A=\$((A+1))
-                    B=0
-                    C=0
-                    echo "Executing Major"
-            fi
-            if [ ${ChoiceResult} == "Middle" ]
-                then
-                    B=\$((B+1))
-                    C=0
-                    echo "Executing Middle"
-                else
-                    C=\$((C+1))
-                    echo "Executing Minor"
-            fi
-            echo "[\$Prefix\$A.\$B.\$C]" > outFile
-            echo Increased: A=\$A, B=\$B, C=\$C
-            """
-            nextVersion = readFile 'outFile'
-            Tag = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"));
-        }
-      }
-    }
     stage("Condition") {
       steps {
         script {
