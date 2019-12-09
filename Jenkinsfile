@@ -5,7 +5,7 @@ properties([disableConcurrentBuilds()])
 def RemoveUnusedImages() {
   sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
 }
-StartVersionFrom = sh "git describe --tags"
+
 pipeline {
   agent {
     label 'master'
@@ -14,6 +14,7 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
     timestamps()
   }
+  StartVersionFrom = sh "git describe --tags"
   parameters {
     string(name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Enter the desired AWS region')
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
