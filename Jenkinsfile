@@ -17,21 +17,27 @@ pipeline {
     booleanParam(name: 'SetNewTag', defaultValue: false, description: 'Auto-increasing version')
     choice(name: 'AppVersion', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
     choice(name: 'NewVersionTrafficWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Amount of traffic to the new vesion of the App')
+    string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
+    string(name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Enter the desired region')
+    string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
   }
   environment {
-    ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
-    AWSRegion = 'us-east-1'
+    ECRURI = "${params.ECRURI}"
+    AWSRegion = "${params.AWSRegion}"
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'weighted-tgs'
     BuildAndTest = "${params.Build}"
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
-    Tag = '1.0.0'
+    StartVersionFrom = '1.0.0'
     ChoiceResult = "${params.Version}"
     CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
+    def RemoveUnusedImages() {
+      sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
+    }
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
-    Email = 'vecinomio@gmail.com'
+    Email = "${params.Email}"
     FailureEmailSubject = "JOB with identifier ${Tag} FAILED"
     SuccessEmailSubject = "JOB with identifier ${Tag} SUCCESS"
   }
@@ -41,7 +47,7 @@ pipeline {
       steps {
         script {
             sh """
-            version=\$(git describe --tags `git rev-list --tags --max-count=1` || echo ${Tag})
+            version=\$(git describe --tags `git rev-list --tags --max-count=1` || echo ${StartVersionFrom})
             FirstSet=\$(echo \$version | cut -d '.' -f 1)
             if [ \${#FirstSet} -ge 2 ];
                 then
@@ -113,7 +119,7 @@ pipeline {
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
-            sh "${DelUnusedImage}"
+            RemoveUnusedImages()
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Build Docker Image Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
             throw (err)
@@ -135,7 +141,7 @@ pipeline {
           }
           catch (err) {
             testContainer.stop()
-            sh "${DelUnusedImage}"
+            RemoveUnusedImages()
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Test Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
             throw (err)
@@ -143,7 +149,7 @@ pipeline {
         }
       }
     }
-    stage("Push artifact to ECR") {
+    stage("Delivery") {
       when { environment name: 'Release', value: 'true' }
       steps {
         script {
@@ -153,10 +159,9 @@ pipeline {
               dockerImage.push()
             }
             currentBuild.result = 'SUCCESS'
-            emailext body: 'Docker Image was successfully delivered to ECR.', subject: "${SuccessEmailSubject}", to: "${Email}"
           }
           catch (err) {
-            sh "${DelUnusedImage}"
+            RemoveUnusedImages()
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Delivery to ECR Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
             throw (err)
@@ -184,7 +189,7 @@ pipeline {
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
-            sh "${DelUnusedImage}"
+            RemoveUnusedImages()
             sh "rm -rf ${OPSRepoBranch}"
             currentBuild.result = 'FAILURE'
             emailext body: "${err}. Tagging Stage Failed, check logs.", subject: "${FailureEmailSubject}", to: "${Email}"
@@ -196,11 +201,10 @@ pipeline {
     }
     stage("CleanUp") {
       steps {
-        sh "${DelUnusedImage}"
-        sh 'docker images'
+        RemoveUnusedImages()
       }
     }
-    stage("Create stack on ECS") {
+    stage("Deployment") {
       when { environment name: 'Deployment', value: 'true' }
       steps {
         script {
