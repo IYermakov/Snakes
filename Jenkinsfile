@@ -2,6 +2,10 @@
 //Only one build can run
 properties([disableConcurrentBuilds()])
 
+def RemoveUnusedImages() {
+  sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
+}
+
 pipeline {
   agent {
     label 'master'
@@ -11,15 +15,15 @@ pipeline {
     timestamps()
   }
   parameters {
+    string(name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Enter the desired AWS region')
+    string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
+    string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
     booleanParam(name: 'Build', defaultValue: true, description: 'Includes Build app and Tests')
     booleanParam(name: 'Release', defaultValue: false, description: 'Includes Tagging and Delivery')
     booleanParam(name: 'Deployment', defaultValue: false, description: 'Deploy a new version of App')
     booleanParam(name: 'SetNewTag', defaultValue: false, description: 'Auto-increasing version')
     choice(name: 'AppVersion', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
     choice(name: 'NewVersionTrafficWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Amount of traffic to the new vesion of the App')
-    string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
-    string(name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Enter the desired region')
-    string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
   }
   environment {
     ECRURI = "${params.ECRURI}"
@@ -33,14 +37,11 @@ pipeline {
     StartVersionFrom = '1.0.0'
     ChoiceResult = "${params.Version}"
     CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
-    def RemoveUnusedImages() {
-      sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
-    }
-    DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
     Email = "${params.Email}"
     FailureEmailSubject = "JOB with identifier ${Tag} FAILED"
     SuccessEmailSubject = "JOB with identifier ${Tag} SUCCESS"
   }
+
   stages {
     stage("Versioning"){
       when { environment name: 'SetNewTag', value: 'true' }
