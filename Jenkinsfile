@@ -17,21 +17,24 @@ pipeline {
     booleanParam(name: 'SetNewTag', defaultValue: false, description: 'Auto-increasing version')
     choice(name: 'AppVersion', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
     choice(name: 'NewVersionTrafficWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Amount of traffic to the new vesion of the App')
+    string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
+    string(name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Enter the desired region')
+    string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
   }
   environment {
-    ECRURI = '054017840000.dkr.ecr.us-east-1.amazonaws.com'
-    AWSRegion = 'us-east-1'
+    ECRURI = "${params.ECRURI}"
+    AWSRegion = "${params.AWSRegion}"
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch = 'weighted-tgs'
     BuildAndTest = "${params.Build}"
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
-    Tag = '1.0.0'
+    StartVersionFrom = '1.0.0'
     ChoiceResult = "${params.Version}"
     CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
-    Email = 'vecinomio@gmail.com'
+    Email = "${params.Email}"
     FailureEmailSubject = "JOB with identifier ${Tag} FAILED"
     SuccessEmailSubject = "JOB with identifier ${Tag} SUCCESS"
   }
@@ -41,7 +44,7 @@ pipeline {
       steps {
         script {
             sh """
-            version=\$(git describe --tags `git rev-list --tags --max-count=1` || echo ${Tag})
+            version=\$(git describe --tags `git rev-list --tags --max-count=1` || echo ${StartVersionFrom})
             FirstSet=\$(echo \$version | cut -d '.' -f 1)
             if [ \${#FirstSet} -ge 2 ];
                 then
