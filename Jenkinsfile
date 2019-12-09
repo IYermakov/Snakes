@@ -40,7 +40,7 @@ pipeline {
     timestamps()
   }
   parameters {
-    string(name: "Current Release is: \n${LastRelease}", defaultValue: "${NewRelease}", description: "New Release will be:")
+    string(name: "Current Release \nis: ${LastRelease}", defaultValue: "${NewRelease}", description: "New Release will be:")
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
     choice(
@@ -51,10 +51,10 @@ pipeline {
         'eu-west-3', 'eu-north-1', 'me-south-1', 'sa-east-1'
       ], name: 'AWSRegion', description: 'Choose the desired AWS region'
     )
-    booleanParam(name: 'Build', defaultValue: true, description: 'Includes Build app and Tests')
-    booleanParam(name: 'Release', defaultValue: false, description: 'Includes Tagging and Delivery')
-    booleanParam(name: 'Deployment', defaultValue: false, description: 'Deploy a new version of App')
-    choice(name: 'NewVersionTrafficWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Amount of traffic to the new vesion of the App')
+    booleanParam(name: 'Build', defaultValue: true, description: 'Specify to Build App and do Tests')
+    booleanParam(name: 'Release', defaultValue: false, description: 'Specify to deliver artifact and tags to the repos')
+    booleanParam(name: 'Deployment', defaultValue: false, description: 'Specify to Deploy a new version of App to ECS')
+    choice(name: 'NewVersionTrafficWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Choose amount of traffic to the new vesion of the App')
   }
   environment {
     ECRURI = "${params.ECRURI}"
