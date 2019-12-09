@@ -6,8 +6,9 @@ def RemoveUnusedImages() {
   sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
 }
 def LastTag() {
-  return sh "pwd"
+  return $(sh "pwd")
 }
+
 pipeline {
   agent {
     label 'master'
