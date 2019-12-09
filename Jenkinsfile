@@ -2,6 +2,10 @@
 //Only one build can run
 properties([disableConcurrentBuilds()])
 
+def RemoveUnusedImages() {
+  sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
+}
+
 pipeline {
   agent {
     label 'master'
@@ -33,9 +37,6 @@ pipeline {
     StartVersionFrom = '1.0.0'
     ChoiceResult = "${params.Version}"
     CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
-    def RemoveUnusedImages() {
-      sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
-    }
     DelUnusedImage = 'docker image prune -af --filter="label=maintainer=devopsa3"'
     Email = "${params.Email}"
     FailureEmailSubject = "JOB with identifier ${Tag} FAILED"
