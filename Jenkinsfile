@@ -41,7 +41,7 @@ pipeline {
   }
   parameters {
     //string(name: 'CurrentRelease', defaultValue: "${LastRelease}", description: 'Version of the last release')
-    string(name: "Current Release is: ${LastRelease}", defaultValue: "${NewRelease}", description: "New Release will be:"
+    string(name: "Current Release is: ${LastRelease}", defaultValue: "${NewRelease}", description: "New Release will be:")
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
     choice(
