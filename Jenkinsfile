@@ -6,7 +6,7 @@ def RemoveUnusedImages() {
   sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
 }
 withEnv(["StartVersionFrom=${myResult}"]) {
-  myResult = sh "git describe --tags `git rev-list --tags --max-count=1`"
+  myResult = sh(script: "git describe --tags `git rev-list --tags --max-count=1`", returnStdout: true)
 }
 pipeline {
   agent {
