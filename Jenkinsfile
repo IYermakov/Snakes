@@ -5,7 +5,9 @@ properties([disableConcurrentBuilds()])
 def RemoveUnusedImages() {
   sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
 }
-StartVersionFrom = RemoveUnusedImages()
+withEnv(["StartVersionFrom=${myResult}"]) {
+  myResult = sh "git describe --tags `git rev-list --tags --max-count=1`"
+}
 pipeline {
   agent {
     label 'master'
@@ -18,7 +20,7 @@ pipeline {
     string(name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Enter the desired AWS region')
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
-    string(name: 'SetNewTag', defaultValue: "${RemoveUnusedImages()}", description: 'New tag will be')
+    string(name: 'SetNewTag', defaultValue: "${StartVersionFrom}", description: 'New tag will be')
     booleanParam(name: 'Build', defaultValue: true, description: 'Includes Build app and Tests')
     booleanParam(name: 'Release', defaultValue: false, description: 'Includes Tagging and Delivery')
     booleanParam(name: 'Deployment', defaultValue: false, description: 'Deploy a new version of App')
