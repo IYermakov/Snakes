@@ -11,18 +11,19 @@ pipeline {
     timestamps()
   }
   parameters {
-    booleanParam(name: 'UpdateALB', defaultValue: false, description: '')
-    choice(name: 'BlueWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: '')
-    choice(name: 'GreenWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: '')
-    booleanParam(name: 'RemovePreviousVersion', defaultValue: false, description: '')
+    booleanParam(   name: 'UpdateALB', defaultValue: false, description: '')
+    choice(         name: 'BlueWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: '')
+    choice(         name: 'GreenWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: '')
+    booleanParam(   name: 'RemovePreviousVersion', defaultValue: false, description: '')
+    string(         name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Desired region for AWS resources')
   }
   environment {
-    OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
-    AWSRegion = 'us-east-1'
-    OPSRepoBranch = 'weighted-tgs'
-    BlueWeight = "${params.BlueWeight}"
-    GreenWeight = "${params.GreenWeight}"
-    RemoveStack = "${params.RemovePreviousVersion}"
+    OPSRepoURL      = 'git@github.com:IYermakov/DevOpsA3Training.git'
+    OPSRepoBranch   = 'weighted-tgs'
+    BlueWeight      = "${params.BlueWeight}"
+    GreenWeight     = "${params.GreenWeight}"
+    RemoveStack     = "${params.RemovePreviousVersion}"
+    AWSRegion       = "${params.AWSRegion}"
   }
   stages {
     stage("Update ALB stack") {
