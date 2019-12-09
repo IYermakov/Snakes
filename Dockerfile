@@ -2,7 +2,7 @@ ARG tomcat_version=9.0.29
 
 FROM alpine
 
-ARG tomcat_version
+ENV tomcat_version=${tomcat_version}
 
 LABEL maintainer="devopsa3"
 
