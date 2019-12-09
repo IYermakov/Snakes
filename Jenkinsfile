@@ -30,11 +30,11 @@ pipeline {
     AWSRegion = "${params.AWSRegion}"
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
-    OPSRepoBranch = 'weighted-tgs'
+    OPSRepoBranch = 'master'
     BuildAndTest = "${params.Build}"
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
-    StartVersionFrom = '1.0.0'
+    StartVersionFrom = '0.0.1'
     ChoiceResult = "${params.Version}"
     CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
     Email = "${params.Email}"
