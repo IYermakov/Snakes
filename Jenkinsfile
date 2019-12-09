@@ -7,6 +7,7 @@ def RemoveUnusedImages() {
 }
 node {
   LastRelease = sh (script: "git describe --tags `git rev-list --tags --max-count=1`", returnStdout: true).trim()
+  NewRelease = (LastRelease.toInteger() + 0.0.1).toString()
 }
 pipeline {
   agent {
@@ -24,7 +25,8 @@ pipeline {
     booleanParam(name: 'Release', defaultValue: false, description: 'Includes Tagging and Delivery')
     booleanParam(name: 'Deployment', defaultValue: false, description: 'Deploy a new version of App')
     // booleanParam(name: 'SetNewTag', defaultValue: false, description: 'Auto-increasing version')
-    string(name: 'SetNewTag', defaultValue: "${LastRelease}", description: 'New tag will be')
+    string(name: 'CurrentRelease', defaultValue: "${LastRelease}", description: 'Version of the last release')
+    string(name: 'NewRelease', defaultValue: "${NewRelease}", description: 'Version of the new release')
     // choice(name: 'AppVersion', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
     choice(name: 'NewVersionTrafficWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Amount of traffic to the new vesion of the App')
   }
