@@ -18,10 +18,11 @@ pipeline {
     string(name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Enter the desired AWS region')
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
+    string(name: 'SetNewTag', defaultValue: "${StartVersionFrom}", description: 'New tag will be')
     booleanParam(name: 'Build', defaultValue: true, description: 'Includes Build app and Tests')
     booleanParam(name: 'Release', defaultValue: false, description: 'Includes Tagging and Delivery')
     booleanParam(name: 'Deployment', defaultValue: false, description: 'Deploy a new version of App')
-    booleanParam(name: 'SetNewTag', defaultValue: false, description: 'Auto-increasing version')
+    // booleanParam(name: 'SetNewTag', defaultValue: false, description: 'Auto-increasing version')
     choice(name: 'AppVersion', choices: ['Minor', 'Middle', 'Major'], description: 'Pick Version Tag')
     choice(name: 'NewVersionTrafficWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Amount of traffic to the new vesion of the App')
   }
