@@ -2,10 +2,6 @@
 //Only one build can run
 properties([disableConcurrentBuilds()])
 
-def RemoveUnusedImages() {
-  sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
-}
-
 pipeline {
   agent {
     label 'master'
@@ -41,6 +37,9 @@ pipeline {
     Email = "${params.Email}"
     FailureEmailSubject = "JOB with identifier ${Tag} FAILED"
     SuccessEmailSubject = "JOB with identifier ${Tag} SUCCESS"
+  }
+  def RemoveUnusedImages() {
+    sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
   }
   stages {
     stage("Versioning"){
