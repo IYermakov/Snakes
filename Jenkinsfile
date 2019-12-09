@@ -40,7 +40,7 @@ pipeline {
     timestamps()
   }
   parameters {
-    string(value: "Current_Release_is_${LastRelease}", name: "Version", defaultValue: "${NewRelease}", description: "New Release will be:")
+    string(name: "NewRelease", defaultValue: "${NewRelease}", description: "Your Current Release is: ${LastRelease}")
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
     choice(
@@ -65,7 +65,7 @@ pipeline {
     BuildAndTest = "${params.Build}"
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
-    Tag = "${params.Version}"
+    Tag = "${params.NewRelease}"
     CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
     Email = "${params.Email}"
     FailureEmailSubject = "JOB with identifier ${Tag} FAILED"
