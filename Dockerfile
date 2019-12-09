@@ -1,15 +1,18 @@
+ARG tomcat_version=9.0.29
 
 FROM alpine
+
+ARG tomcat_version
 
 LABEL maintainer="devopsa3"
 
 RUN apk add openjdk8 curl
 
 RUN cd /usr/local/ \
-  && wget http://apache.ip-connect.vn.ua/tomcat/tomcat-9/v9.0.29/bin/apache-tomcat-9.0.29.tar.gz \
-  && tar xzf apache-tomcat-8.5.49.tar.gz \
-  && mv apache-tomcat-8.5.49/ tomcat/ \
-  && rm apache-tomcat-8.5.49.tar.gz
+  && wget http://apache.ip-connect.vn.ua/tomcat/tomcat-9/v${tomcat_version}/bin/apache-tomcat-${tomcat_version}.tar.gz \
+  && tar xzf apache-tomcat-${tomcat_version}.tar.gz \
+  && mv apache-tomcat-${tomcat_version}/ tomcat/ \
+  && rm apache-tomcat-${tomcat_version}.tar.gz
 
 WORKDIR /home/project
 
