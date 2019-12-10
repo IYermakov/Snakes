@@ -1,12 +1,12 @@
-ARG tomcat_version=9.0.29
-
 FROM alpine
 
-ENV tomcat_version=${tomcat_version}
+ENV tomcat_version=9.0.29
 
 LABEL maintainer="devopsa3"
 
 RUN apk add openjdk8 curl
+
+RUN echo TVER == ${tomcat_version}
 
 RUN cd /usr/local/ \
   && tomcat_ver_maj_okt=$(echo ${tomcat_version} | cut -d '.' -f 1) \
