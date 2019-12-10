@@ -66,7 +66,8 @@ pipeline {
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
     Tag = "${params.NewRelease}"
-    CurrentVersionTrafficWeight = (10 - "${params.NewVersionTrafficWeight}".toInteger()).toString()
+    MaxWeight = 10
+    CurrentVersionTrafficWeight = (MaxWeight - "${params.NewVersionTrafficWeight}".toInteger()).toString()
     Email = "${params.Email}"
     FailureEmailSubject = "JOB with identifier ${Tag} FAILED"
     SuccessEmailSubject = "JOB with identifier ${Tag} SUCCESS"
