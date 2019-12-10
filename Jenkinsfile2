@@ -15,8 +15,8 @@ def getWeight() {
 }
 
 node {
-  CurrentStackWeight = sh(script: """aws cloudformation describe-stacks --stack-name alb --query "Stacks[].Parameters[?ParameterKey=='BlueWeight'].ParameterValue" --output text --region us-east-1""")
-  NewStackWeight = sh(script: """aws cloudformation describe-stacks --stack-name alb --query "Stacks[].Parameters[?ParameterKey=='BlueWeight'].ParameterValue" --output text --region us-east-1""")
+  CurrentStackWeight = sh(script: """aws cloudformation describe-stacks --stack-name alb --query "Stacks[].Parameters[?ParameterKey=='BlueWeight'].ParameterValue" --output text --region us-east-1""", returnStdout: true).trim()
+  NewStackWeight = sh(script: """aws cloudformation describe-stacks --stack-name alb --query "Stacks[].Parameters[?ParameterKey=='BlueWeight'].ParameterValue" --output text --region us-east-1""", returnStdout: true).trim()
 }
 
 pipeline {
