@@ -5,6 +5,14 @@ properties([disableConcurrentBuilds()])
 def RemoveUnusedImages() {
   sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
 }
+def GetRegions() {
+  return [
+    'us-east-1', 'us-east-2', 'us-west-1', 'us-west-2', 'ap-east-1', 'ap-south-1',
+    'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1', 'ap-northeast-2', 'ap-northeast-3',
+    'ca-central-1', 'cn-north-1', 'cn-northwest-1', 'eu-central-1', 'eu-west-1', 'eu-west-2',
+    'eu-west-3', 'eu-north-1', 'me-south-1', 'sa-east-1'
+  ]
+}
 
 node {
   StartVersionFrom = '0.0.0'
@@ -44,12 +52,7 @@ pipeline {
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
     choice(
-      choices: [
-        'us-east-1', 'us-east-2', 'us-west-1', 'us-west-2', 'ap-east-1', 'ap-south-1',
-        'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1', 'ap-northeast-2', 'ap-northeast-3',
-        'ca-central-1', 'cn-north-1', 'cn-northwest-1', 'eu-central-1', 'eu-west-1', 'eu-west-2',
-        'eu-west-3', 'eu-north-1', 'me-south-1', 'sa-east-1'
-      ], name: 'AWSRegion', description: 'Choose the desired AWS region'
+      choices: GetRegions(), name: 'AWSRegion', description: 'Choose the desired AWS region'
     )
     booleanParam(name: 'Build', defaultValue: true, description: 'Specify to Build App and do Tests')
     booleanParam(name: 'Release', defaultValue: false, description: 'Specify to deliver an artifact to ECR and tags to Github repos')
