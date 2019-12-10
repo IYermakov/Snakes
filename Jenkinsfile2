@@ -28,7 +28,7 @@ pipeline {
   }
   environment {
     OPSRepoURL      = 'git@github.com:IYermakov/DevOpsA3Training.git'
-    OPSRepoBranch   = 'master'
+    OPSRepoBranch   = 'weighted-tgs'
     BlueWeight      = "${params.BlueWeight}"
     GreenWeight     = "${params.GreenWeight}"
     RemoveStack     = "${params.RemovePreviousVersion}"

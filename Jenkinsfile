@@ -62,7 +62,7 @@ pipeline {
     AWSRegion = "${params.AWSRegion}"
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
-    OPSRepoBranch = 'master'
+    OPSRepoBranch = 'weighted-tgs'
     BuildAndTest = "${params.Build}"
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
