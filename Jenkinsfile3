@@ -55,7 +55,6 @@ pipeline {
               sh "echo ${CurrentGreenWeight}"
               NextGreenWeight = (CurrentGreenWeight.toInteger() + 10).toString()
               sh "echo ${NextGreenWeight}"
-              sh "echo ${BlueWeight}"
               BlueWeight = (MaxWeight - NextGreenWeight.toInteger()).toString()
               sh "echo ${BlueWeight}"
               sh "aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides BlueWeight=${BlueWeight} GreenWeight=${NextGreenWeight}  --capabilities CAPABILITY_IAM --region ${AWSRegion}"
