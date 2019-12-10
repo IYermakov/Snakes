@@ -24,7 +24,7 @@ pipeline {
   }
   parameters {
     booleanParam(   name: 'UpdateALB', defaultValue: false, description: 'ALB TG weights will be updated unly if checkbox selected')
-    choice(         name: 'NewVersionTrafficWeight', choices: getWeight(), description: 'Set the amount of traffic for the new version in %. \nExample: If choose 20, than 20% of the traffic will go to the new version, and 80% to the old one.')
+    choice(         name: 'NewVersionTrafficWeight', choices: getWeight(), description: 'Set the amount of traffic for the new version in %. \nExample: If choose 20, than 20% of the traffic will forward to the new version, and 80% to the old one.')
     booleanParam(   name: 'RemovePreviousVersion', defaultValue: false, description: 'Remove outdated stack')
     choice(         name: 'AWSRegion',   choices: getRegions(), description: 'Choose the desired AWS region')
   }
