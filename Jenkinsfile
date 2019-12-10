@@ -88,6 +88,7 @@ pipeline {
       steps {
         script {
           try {
+            sh "echo ${CurrentVersionTrafficWeight}"
             sh 'cd eb-tomcat-snakes && ./build.sh'
             currentBuild.result = 'SUCCESS'
           }
