@@ -13,8 +13,13 @@ def getRegions() {
 def getGreenWeight() {
   return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 }
-def getBlueWeight() {
-  return [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+
+node {
+  MaxWeight       = 10
+  BlueWeight      = (MaxWeight - "${params.GreenWeight}".toInteger()).toString()
+  LastStackName   = sh (script: """aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task')].[StackName]" --region ${AWSRegion}""")
+  LastStackColor  =
+  LastStackWeight =  
 }
 
 pipeline {
@@ -27,7 +32,7 @@ pipeline {
   }
   parameters {
     booleanParam(   name: 'UpdateALB', defaultValue: false, description: 'ALB TG weights will be updated unly if checkbox selected')
-    choice(         name: 'BlueWeight',  choices: getBlueWeight(), description: 'Set the weight of ALB TG')
+    // choice(         name: 'BlueWeight',  choices: getBlueWeight(), description: 'Set the weight of ALB TG')
     choice(         name: 'GreenStackWeight', choices: getGreenWeight(), description: 'Set the weight of ALB TG')
     choice(         name: 'AWSRegion',   choices: getRegions(), description: 'Choose the desired AWS region')
     booleanParam(   name: 'RemovePreviousVersion', defaultValue: false, description: 'Remove outdated stack')
@@ -35,9 +40,7 @@ pipeline {
   environment {
     OPSRepoURL      = 'git@github.com:IYermakov/DevOpsA3Training.git'
     OPSRepoBranch   = 'master'
-    MaxWeight       = 10
-    BlueWeight      = (MaxWeight - "${params.GreenWeight}".toInteger()).toString()
-    GreenWeight     = "${params.GreenWeight}"
+    GreenWeight     = "${params.GreenStackWeight}"
     RemoveStack     = "${params.RemovePreviousVersion}"
     AWSRegion       = "${params.AWSRegion}"
   }
