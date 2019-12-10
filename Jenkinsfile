@@ -88,7 +88,6 @@ pipeline {
       steps {
         script {
           try {
-            sh "echo ${CurrentVersionTrafficWeight}"
             sh 'cd eb-tomcat-snakes && ./build.sh'
             currentBuild.result = 'SUCCESS'
           }
@@ -125,8 +124,9 @@ pipeline {
         script {
           try {
             testContainer = dockerImage.run('-p 8090:8080 --name test')
-            sh 'sleep 10'
-            sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
+            retry(5) {
+              sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
+            }
             testContainer.stop()
             currentBuild.result = 'SUCCESS'
           }
