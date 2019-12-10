@@ -2,6 +2,15 @@
 //Only one build can run
 properties([disableConcurrentBuilds()])
 
+def getRegions() {
+  return [
+    'us-east-1', 'us-east-2', 'us-west-1', 'us-west-2', 'ap-east-1', 'ap-south-1',
+    'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1', 'ap-northeast-2', 'ap-northeast-3',
+    'ca-central-1', 'cn-north-1', 'cn-northwest-1', 'eu-central-1', 'eu-west-1', 'eu-west-2',
+    'eu-west-3', 'eu-north-1', 'me-south-1', 'sa-east-1'
+  ]
+}
+
 pipeline {
   agent {
     label 'master'
@@ -12,14 +21,14 @@ pipeline {
   }
   parameters {
     booleanParam(   name: 'UpdateALB', defaultValue: false, description: 'ALB TG weights will be updated unly if checkbox selected')
-    choice(         name: 'BlueWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Set the weight of ALB TG')
+    choice(         name: 'BlueWeight',  choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Set the weight of ALB TG')
     choice(         name: 'GreenWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Set the weight of ALB TG')
+    choice(         name: 'AWSRegion',   choices: getRegions(), description: 'Choose the desired AWS region')
     booleanParam(   name: 'RemovePreviousVersion', defaultValue: false, description: 'Remove outdated stack')
-    string(         name: 'AWSRegion', defaultValue: 'us-east-1', description: 'Desired region for AWS resources')
   }
   environment {
     OPSRepoURL      = 'git@github.com:IYermakov/DevOpsA3Training.git'
-    OPSRepoBranch   = 'weighted-tgs'
+    OPSRepoBranch   = 'master'
     BlueWeight      = "${params.BlueWeight}"
     GreenWeight     = "${params.GreenWeight}"
     RemoveStack     = "${params.RemovePreviousVersion}"
