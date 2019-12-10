@@ -10,6 +10,9 @@ def getRegions() {
     'eu-west-3', 'eu-north-1', 'me-south-1', 'sa-east-1'
   ]
 }
+def getWeight() {
+  return [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+}
 def removeUnusedImages() {
   sh 'docker image prune -af --filter="label=maintainer=devopsa3"'
 }
@@ -55,7 +58,7 @@ pipeline {
     booleanParam(name: 'Build', defaultValue: true, description: 'Specify to Build App and do Tests')
     booleanParam(name: 'Release', defaultValue: false, description: 'Specify to deliver an artifact to ECR and tags to Github repos')
     booleanParam(name: 'Deployment', defaultValue: false, description: 'Specify to Deploy a new version of App to ECS')
-    choice(name: 'NewVersionTrafficWeight', choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], description: 'Choose amount of traffic to the new vesion of the App')
+    choice(name: 'NewVersionTrafficWeight', choices: getWeight(), description: 'Set the amount of traffic for the new version in %. \nExample: If choose 10, than 10% of the traffic will forward to the new version, and 90% to the current one.')
   }
   environment {
     ECRURI = "${params.ECRURI}"
@@ -67,7 +70,7 @@ pipeline {
     Release = "${params.Release}"
     Deployment = "${params.Deployment}"
     Tag = "${params.NewRelease}"
-    MaxWeight = 10
+    MaxWeight = 100
     CurrentVersionTrafficWeight = (MaxWeight - "${params.NewVersionTrafficWeight}".toInteger()).toString()
     Email = "${params.Email}"
     FailureEmailSubject = "JOB with identifier ${Tag} FAILED"
