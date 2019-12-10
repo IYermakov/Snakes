@@ -10,16 +10,8 @@ def getRegions() {
     'eu-west-3', 'eu-north-1', 'me-south-1', 'sa-east-1'
   ]
 }
-def getGreenWeight() {
-  return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-}
-
-node {
-  MaxWeight       = 10
-  BlueWeight      = (MaxWeight - "${params.GreenWeight}".toInteger()).toString()
-  LastStackName   = sh (script: """aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task')].[StackName]" --region ${AWSRegion}""")
-  LastStackColor  =
-  LastStackWeight =  
+def getWeight() {
+  return [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
 }
 
 pipeline {
@@ -31,16 +23,19 @@ pipeline {
     timestamps()
   }
   parameters {
+
     booleanParam(   name: 'UpdateALB', defaultValue: false, description: 'ALB TG weights will be updated unly if checkbox selected')
-    // choice(         name: 'BlueWeight',  choices: getBlueWeight(), description: 'Set the weight of ALB TG')
-    choice(         name: 'GreenStackWeight', choices: getGreenWeight(), description: 'Set the weight of ALB TG')
     choice(         name: 'AWSRegion',   choices: getRegions(), description: 'Choose the desired AWS region')
+    // choice(         name: 'BlueWeight',  choices: getBlueWeight(), description: 'Set the weight of ALB TG')
+    choice(         name: 'NewVersionTrafficWeight', choices: getWeight(), description: 'Set the amount of traffic for the new version in %. Example: choosing 20, 20% of the traffic will go to the new version, and 80% to the old one.')
     booleanParam(   name: 'RemovePreviousVersion', defaultValue: false, description: 'Remove outdated stack')
   }
   environment {
     OPSRepoURL      = 'git@github.com:IYermakov/DevOpsA3Training.git'
-    OPSRepoBranch   = 'master'
-    GreenWeight     = "${params.GreenStackWeight}"
+    OPSRepoBranch   = 'weighted-tgs'
+    MaxWeight       = 100
+    BlueWeight      = (MaxWeight - "${params.NewVersionTrafficWeight}".toInteger()).toString()
+    GreenWeight     = "${params.NewVersionTrafficWeight}"
     RemoveStack     = "${params.RemovePreviousVersion}"
     AWSRegion       = "${params.AWSRegion}"
   }
@@ -85,7 +80,7 @@ pipeline {
                         GreenWeight="1"
                         BlueWeight="0"
                 fi
-                aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides VPCStackName=DevVPC BlueWeight=\$BlueWeight GreenWeight=\$GreenWeight  --capabilities CAPABILITY_IAM --region ${AWSRegion}  || echo "ALB stack was not updated. WEB stack will be deleted."
+                aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides VPCStackName=DevVPC BlueWeight=\$BlueWeight GreenWeight=\$GreenWeight  --capabilities CAPABILITY_IAM --region ${AWSRegion}  || echo "No changes for ALB Stack."
                 aws cloudformation delete-stack --stack-name \$StackToRemove --region ${AWSRegion}
                 """
             }
