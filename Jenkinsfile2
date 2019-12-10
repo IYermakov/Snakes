@@ -14,6 +14,11 @@ def getWeight() {
   return [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 }
 
+node {
+  CurrentStackWeight = sh(script: """aws cloudformation describe-stacks --stack-name alb --query "Stacks[].Parameters[?ParameterKey=='BlueWeight'].ParameterValue" --output text --region us-east-1""")
+  NewStackWeight = sh(script: """aws cloudformation describe-stacks --stack-name alb --query "Stacks[].Parameters[?ParameterKey=='BlueWeight'].ParameterValue" --output text --region us-east-1""")
+}
+
 pipeline {
   agent {
     label 'master'
@@ -24,7 +29,7 @@ pipeline {
   }
   parameters {
     booleanParam(   name: 'UpdateALB', defaultValue: false, description: 'ALB TG weights will be updated only if checkbox selected')
-    choice(         name: 'NewVersionTrafficWeight', choices: getWeight(), description: 'Set the amount of traffic for the new version in %. \nExample: If choose 20, than 20% of the traffic will forward to the new version, and 80% to the old one.')
+    choice(         name: 'NewVersionTrafficWeight', choices: getWeight(), description: "NewVersionTrafficWeight is ${NewStackWeight}% now. \nSet the amount of traffic for the new version in %. \nExample: If choose 20, than 20% of the traffic will forward to the new version, and 80% to the old one.")
     booleanParam(   name: 'RemovePreviousVersion', defaultValue: false, description: 'Remove outdated stack')
     choice(         name: 'AWSRegion',   choices: getRegions(), description: 'Choose the desired AWS region')
   }
