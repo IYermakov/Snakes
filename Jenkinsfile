@@ -58,7 +58,7 @@ pipeline {
     booleanParam(name: 'Build', defaultValue: true, description: 'Specify to Build App and do Tests')
     booleanParam(name: 'Release', defaultValue: false, description: 'Specify to deliver an artifact to ECR and tags to Github repos')
     booleanParam(name: 'Deployment', defaultValue: false, description: 'Specify to Deploy a new version of App to ECS')
-    choice(name: 'NewVersionTrafficWeight', choices: getWeight(), description: 'Set the amount of traffic for the new version in %. \nExample: If choose 10, than 10% of the traffic will forward to the new version, and 90% to the old one.')
+    choice(name: 'NewVersionTrafficWeight', choices: getWeight(), description: 'Set the amount of traffic for the new version in %. \nExample: If choose 10, than 10% of the traffic will forward to the new version, and 90% to the current one.')
   }
   environment {
     ECRURI = "${params.ECRURI}"
