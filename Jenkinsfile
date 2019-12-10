@@ -124,8 +124,9 @@ pipeline {
         script {
           try {
             testContainer = dockerImage.run('-p 8090:8080 --name test')
-            retry(30) {
+            retry(10) {
               sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
+              sh 'sleep 5'
             }
             testContainer.stop()
             currentBuild.result = 'SUCCESS'
