@@ -81,11 +81,6 @@ pipeline {
 
   stages {
     stage("Tag Condition") {
-      when {
-        allOf {
-          environment name: 'RemovePreviousVersion', value: 'false'
-        }
-      }
       steps {
         script {
           if (Release == 'false') {
@@ -216,7 +211,6 @@ pipeline {
       when {
         allOf {
           environment name: 'BuildAndTest', value: 'true'
-          environment name: 'RemovePreviousVersion', value: 'false'
         }
       }
       steps {
