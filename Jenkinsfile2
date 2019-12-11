@@ -1,0 +1,96 @@
+#!groovy
+//Only one build can run
+properties([disableConcurrentBuilds()])
+
+def getRegions() {
+  return [
+    'us-east-1', 'us-east-2', 'us-west-1', 'us-west-2', 'ap-east-1', 'ap-south-1',
+    'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1', 'ap-northeast-2', 'ap-northeast-3',
+    'ca-central-1', 'cn-north-1', 'cn-northwest-1', 'eu-central-1', 'eu-west-1', 'eu-west-2',
+    'eu-west-3', 'eu-north-1', 'me-south-1', 'sa-east-1'
+  ]
+}
+def getWeight() {
+  return [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+}
+
+pipeline {
+  agent {
+    label 'master'
+  }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
+    timestamps()
+  }
+  parameters {
+    booleanParam(   name: 'UpdateALB', defaultValue: false, description: 'ALB TG weights will be updated only if checkbox selected')
+    choice(         name: 'NewVersionTrafficWeight', choices: getWeight(), description: 'Set the amount of traffic for the new version in %. \nExample: If choose 20, than 20% of the traffic will forward to the new version, and 80% to the old one.')
+    booleanParam(   name: 'RemovePreviousVersion', defaultValue: false, description: 'Remove outdated stack')
+    choice(         name: 'AWSRegion',   choices: getRegions(), description: 'Choose the desired AWS region')
+  }
+  environment {
+    OPSRepoURL      = 'git@github.com:IYermakov/DevOpsA3Training.git'
+    OPSRepoBranch   = 'master'
+    MaxWeight       = 100
+    BlueWeight      = (MaxWeight - "${params.NewVersionTrafficWeight}".toInteger()).toString()
+    GreenWeight     = "${params.NewVersionTrafficWeight}"
+    RemoveStack     = "${params.RemovePreviousVersion}"
+    AWSRegion       = "${params.AWSRegion}"
+  }
+  stages {
+    stage("Update ALB stack") {
+      when { environment name: 'UpdateALB', value: 'true' }
+      steps {
+        script {
+          try {
+            sh "rm -rf ${OPSRepoBranch}"
+            sh "mkdir -p ${OPSRepoBranch}"
+            dir("${OPSRepoBranch}") {
+              git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}", credentialsId: "devopsa3")
+              sh "aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides BlueWeight=${BlueWeight} GreenWeight=${GreenWeight}  --capabilities CAPABILITY_IAM --region ${AWSRegion}"
+            }
+            currentBuild.result = 'SUCCESS'
+          }
+          catch (err) {
+            sh "pwd && rm -rf ${OPSRepoBranch}"
+            currentBuild.result = 'FAILURE'
+            throw (err)
+          }
+          echo "result is: ${currentBuild.currentResult}"
+        }
+      }
+    }
+    stage("Remove Previous Version") {
+      when { environment name: 'RemoveStack', value: 'true' }
+      steps {
+        script {
+          try {
+            dir("${OPSRepoBranch}") {
+              git(url: "${OPSRepoURL}", branch: "${OPSRepoBranch}", credentialsId: "devopsa3")
+              sh """
+                StackToRemove=\$(aws cloudformation describe-stacks --output text --query "Stacks[?contains(StackName,'ECS-task')].[StackName]" --region ${AWSRegion} | tail -1)
+                Color=\$(aws cloudformation describe-stacks --stack-name \$StackToRemove --query "Stacks[].Parameters[?ParameterKey=='DeploymentColor'].ParameterValue" --output text --region ${AWSRegion} | tail -1)
+                if [ \$Color == "Green" ]
+                    then
+                        GreenWeight="0"
+                        BlueWeight="1"
+                    else
+                        GreenWeight="1"
+                        BlueWeight="0"
+                fi
+                aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides VPCStackName=DevVPC BlueWeight=\$BlueWeight GreenWeight=\$GreenWeight  --capabilities CAPABILITY_IAM --region ${AWSRegion}  || echo "No changes for ALB Stack."
+                aws cloudformation delete-stack --stack-name \$StackToRemove --region ${AWSRegion}
+                """
+            }
+            currentBuild.result = 'SUCCESS'
+          }
+          catch (err) {
+            currentBuild.result = 'FAILURE'
+            throw (err)
+          }
+          echo "result is: ${currentBuild.currentResult}"
+        }
+      }
+    }
+  }
+}
