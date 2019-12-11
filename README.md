@@ -32,5 +32,5 @@ Is Managing Application Load Balancer parameters and can destroy AWS CFN stack w
 Link to Jenkins:
 https://ci.devopsa3.me.uk/
 
-Link to origin application:
-https://github.com/aws-samples/eb-tomcat-snakes
+Link to application:
+https://www.devopsa3.me.uk/
