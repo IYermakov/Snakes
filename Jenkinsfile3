@@ -81,6 +81,12 @@ pipeline {
 
   stages {
     stage("Tag Condition") {
+      when {
+        allOf {
+          environment name: 'UpdateALB', value: 'false'
+          environment name: 'RemovePreviousVersion', value: 'false'
+        }
+      }
       steps {
         script {
           if (Release == 'false') {
@@ -208,6 +214,12 @@ pipeline {
       }
     }
     stage("CleanUp") {
+      when {
+        allOf {
+          environment name: 'UpdateALB', value: 'false'
+          environment name: 'RemovePreviousVersion', value: 'false'
+        }
+      }
       steps {
         removeUnusedImages()
       }
