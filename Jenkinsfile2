@@ -30,7 +30,7 @@ pipeline {
   }
   environment {
     OPSRepoURL      = 'git@github.com:IYermakov/DevOpsA3Training.git'
-    OPSRepoBranch   = 'master'
+    OPSRepoBranch   = 'weighted-tgs'
     MaxWeight       = 100
     BlueWeight      = (MaxWeight - "${params.NewVersionTrafficWeight}".toInteger()).toString()
     GreenWeight     = "${params.NewVersionTrafficWeight}"
