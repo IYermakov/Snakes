@@ -238,7 +238,7 @@ pipeline {
         script {
           try {
             dir("${OPSRepoBranch}") {
-              sh "aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides BlueWeight=${CurrentVersionTrafficWeight} GreenWeight=${NewVersionTrafficWeight}  --capabilities CAPABILITY_IAM --region ${AWSRegion}"
+              sh "aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides BlueWeight=${CurrentVersionTrafficWeight} GreenWeight=${NewVersionTrafficWeight}  --capabilities CAPABILITY_IAM --region ${AWSRegion} || echo 'No changes for ALB Stack.'"
             }
             currentBuild.result = 'SUCCESS'
           }
@@ -251,7 +251,7 @@ pipeline {
       }
     }
     stage("Remove Previous Version") {
-      when { environment name: 'RemoveStack', value: 'true' }
+      when { environment name: 'RemovePreviousVersion', value: 'true' }
       steps {
         script {
           try {
