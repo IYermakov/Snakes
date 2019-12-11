@@ -14,11 +14,6 @@ def getWeight() {
   return [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 }
 
-node {
-  CurrentStackWeight = sh(script: """aws cloudformation describe-stacks --stack-name alb --query "Stacks[].Parameters[?ParameterKey=='BlueWeight'].ParameterValue" --output text --region us-east-1""", returnStdout: true).trim()
-  NewStackWeight = sh(script: """aws cloudformation describe-stacks --stack-name alb --query "Stacks[].Parameters[?ParameterKey=='GreenWeight'].ParameterValue" --output text --region us-east-1""", returnStdout: true).trim()
-}
-
 pipeline {
   agent {
     label 'master'
@@ -54,6 +49,12 @@ pipeline {
               CurrentGreenWeight = sh(script: """aws cloudformation describe-stacks --stack-name alb --query "Stacks[].Parameters[?ParameterKey=='GreenWeight'].ParameterValue" --output text --region ${AWSRegion}""", returnStdout: true).trim()
               sh "echo ${CurrentGreenWeight}"
               NextGreenWeight = (CurrentGreenWeight.toInteger() + 10).toString()
+              sh "echo ${NextGreenWeight}"
+              BlueWeight = (100 - NextGreenWeight.toInteger()).toString()
+              sh "echo ${BlueWeight}"
+              sh "aws cloudformation deploy --stack-name alb --template-file ops/cloudformation/alb.yml --parameter-overrides BlueWeight=${BlueWeight} GreenWeight=${NextGreenWeight}  --capabilities CAPABILITY_IAM --region ${AWSRegion}"
+              sleep 20
+              NextGreenWeight = (NextGreenWeight.toInteger() + 10).toString()
               sh "echo ${NextGreenWeight}"
               BlueWeight = (100 - NextGreenWeight.toInteger()).toString()
               sh "echo ${BlueWeight}"
