@@ -55,7 +55,7 @@ pipeline {
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
     choice(choices: getRegions(), name: 'AWSRegion', description: 'Choose the desired AWS region')
-    booleanParam(name: 'Build', defaultValue: true, description: 'Specify to Build App and do Tests')
+    booleanParam(name: 'Build', defaultValue: false, description: 'Specify to Build App and do Tests')
     booleanParam(name: 'Release', defaultValue: false, description: 'Specify to deliver an artifact to ECR and tags to Github repos')
     booleanParam(name: 'Deployment', defaultValue: false, description: 'Specify to Deploy a new version of App to ECS')
     booleanParam(name: 'UpdateALB', defaultValue: false, description: 'ALB TG weights will be updated only if checkbox selected')
@@ -203,7 +203,14 @@ pipeline {
       }
     }
     stage("Deployment") {
-      when { environment name: 'Deployment', value: 'true' }
+      when {
+        allOf {
+          environment name: 'Deployment', value: 'true'
+          environment name: 'BuildAndTest', value: 'true'
+          environment name: 'Release', value: 'true'
+          environment name: 'RemovePreviousVersion', value: 'false'
+        }
+      }
       steps {
         script {
           try {
@@ -251,7 +258,12 @@ pipeline {
       }
     }
     stage("Remove Previous Version") {
-      when { environment name: 'RemovePreviousVersion', value: 'true' }
+      when {
+        allOf {
+          environment name: 'RemovePreviousVersion', value: 'true'
+          environment name: 'Deployment', value: 'false'
+        }
+      }
       steps {
         script {
           try {
