@@ -1,4 +1,4 @@
-FROM tomcat:8
+FROM tomcat:latest
 
 LABEL maintainer="devopsa3" \
       description="tomcat-8 image with application about snakes"
