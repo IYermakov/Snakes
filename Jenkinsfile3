@@ -152,6 +152,7 @@ pipeline {
         allOf {
           environment name: 'Release', value: 'true'
           environment name: 'Deployment', value: 'true'
+          environment name: 'RemovePreviousVersion', value: 'false'
         }
       }
       steps {
@@ -178,6 +179,7 @@ pipeline {
         allOf {
           environment name: 'Release', value: 'true'
           environment name: 'Deployment', value: 'true'
+          environment name: 'RemovePreviousVersion', value: 'false'
         }
       }
       steps {
