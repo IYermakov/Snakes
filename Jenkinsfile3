@@ -83,7 +83,6 @@ pipeline {
     stage("Tag Condition") {
       when {
         allOf {
-          environment name: 'UpdateALB', value: 'false'
           environment name: 'RemovePreviousVersion', value: 'false'
         }
       }
@@ -217,7 +216,6 @@ pipeline {
       when {
         allOf {
           environment name: 'BuildAndTest', value: 'true'
-          environment name: 'UpdateALB', value: 'false'
           environment name: 'RemovePreviousVersion', value: 'false'
         }
       }
