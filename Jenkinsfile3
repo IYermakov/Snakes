@@ -203,7 +203,14 @@ pipeline {
       }
     }
     stage("Deployment") {
-      when { environment name: 'Deployment', value: 'true' }
+      when {
+        allOf {
+          environment name: 'Deployment', value: 'true'
+          environment name: 'BuildAndTest', value: 'true'
+          environment name: 'Release', value: 'true'
+          environment name: 'RemovePreviousVersion', value: 'false'
+        }
+      }
       steps {
         script {
           try {
@@ -251,7 +258,12 @@ pipeline {
       }
     }
     stage("Remove Previous Version") {
-      when { environment name: 'RemovePreviousVersion', value: 'true' }
+      when {
+        allOf {
+          environment name: 'RemovePreviousVersion', value: 'true'
+          environment name: 'Deployment', value: 'false'
+        }
+      }
       steps {
         script {
           try {
