@@ -52,11 +52,24 @@ The script compiles the project's classes, packs the necessary files into a web 
 
 Open [localhost:8080](http://localhost:8080/) in a web browser to check the running application.
 
-## Сontainerized deployment
-We can use containerized tool - Docker to run the application.
+## Сontainerized development
+We can use special tool - Docker to run the application inside the isolated container.
 Repository already have Dockerfile which contain strict commands for container building.
 
-### Build docker image with application:
+### Install Docker
+    $ sudo apt-get install -y docker.io
+    $ sudo systemctl start docker
+    $ sudo groupadd docker
+    $ sudo usermod -aG docker $USER
+
+### Build WAR file with application
+Run build.sh to compile the web app and create a WAR file
+        
+    $ cd Snakes/
+    $ sudo sh -c 'chmod +x eb-tomcat-snakes/build.sh'
+    $ eb-tomcat-snakes/build.sh
+        
+### Build and run docker image with application:
 Navigate to folder that contain Dockerfile and build:
 
     $ docker build -t snakes-web-application .
