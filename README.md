@@ -52,6 +52,24 @@ The script compiles the project's classes, packs the necessary files into a web 
 
 Open [localhost:8080](http://localhost:8080/) in a web browser to check the running application.
 
+## Сontainerized deployment
+We can use containerized tool - Docker to run the application.
+Repository already have Dockerfile which contain strict commands for container building.
+
+### Build docker image with application:
+Navigate to folder that contain Dockerfile and build:
+
+    $ docker build -t snakes-web-application .
+
+Run docker container from previously builded image:
+
+    $ docker run -d -p 8080:8080 --name snakes snakes-web-application
+
+Check the result
+
+    $ docker ps
+    $ curl http://localhost:8080/
+
 ## Automatic deployment with Jenkins
 Repository consist two Jenkins pipeline scripts for deployment management.
 Deployment works with Docker image and use AWS ECS/ECR services.
