@@ -5,18 +5,51 @@ The main goal is not to create complex functionality, but configure optimal CI/C
  
 ## Application requirements
 Install the Java 8 JDK. The java compiler is required to run the build script. 
+For Ubuntu or Debian would run:
+
+    $ sudo apt update 
+    $ sudo apt install openjdk-8-jdk
+    $ java -version
+
 Install Tomcat 8+ to run compiled WAR file.
 
-## Manual deployment
+For Ubuntu or Debian would run:
+
+    $ sudo groupadd tomcat
+    $ sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+    $ wget http://apache.ip-connect.vn.ua/tomcat/tomcat-9/v9.0.29/bin/apache-tomcat-9.0.29.tar.gz
+    $ tar xzf apache-tomcat-9.0.29.tar.gz
+    $ sudo mkdir /opt/tomcat
+    $ mv apache-tomcat-9.0.29/ /opt/tomcat/
+    $ sudo chown -R tomcat: /opt/tomcat
+    $ sudo sh -c 'chmod +x /opt/tomcat/bin/*.sh'
+    $ /opt/tomcat/bin/catalina.sh run
+    
+and you should see Tomcat default page    
+
+    # curl http://localhost:8080/
+
+## Manual application deployment
 To download, build and deploy the project:
 - Clone the project 
+
+        $ git clone https://github.com/IYermakov/Snakes.git
+    
 - Run build.sh to compile the web app and create a WAR file
+        
+        $ cd Snakes/
+        $ sudo sh -c 'chmod +x eb-tomcat-snakes/build.sh'
+        $ eb-tomcat-snakes/build.sh
 
 **IMPORTANT**
 Always run build.sh from the root of the project directory.
 The script compiles the project's classes, packs the necessary files into a web archive
 
 - Paste WAR file to Tomcat server.
+
+        $ sudo rm -rf /opt/tomcat/webapps/ROOT/
+        $ cd eb-tomcat-snakes && cp ROOT.war /opt/tomcat/webapps/
+
 Open [localhost:8080](http://localhost:8080/) in a web browser to check the running application.
 
 ## Automatic deployment with Jenkins
