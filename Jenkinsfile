@@ -63,6 +63,7 @@ pipeline {
   }
   environment {
     ECRURI = "${params.ECRURI}"
+    TomcatVersion = "${params.TomcatVersion}"
     AWSRegion = "${params.AWSRegion}"
     AppRepoName = 'snakes'
     OPSRepoURL = 'git@github.com:IYermakov/DevOpsA3Training.git'
