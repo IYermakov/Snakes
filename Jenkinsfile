@@ -52,7 +52,7 @@ pipeline {
   }
   parameters {
     string(name: "NewRelease", defaultValue: "${NewRelease}", description: "Your Current Release is: ${LastRelease} Change the version of New Release if necessary")
-    string(name: 'tomcat_version', defaultValue: '9.0.30', description: 'Change the TomCat version if needed')
+    string(name: 'TomcatVersion', defaultValue: '9.0.30', description: 'Change the TomCat version if needed')
     string(name: 'ECRURI', defaultValue: '054017840000.dkr.ecr.us-east-1.amazonaws.com', description: 'Enter the URI of the Container Registry')
     string(name: 'Email', defaultValue: 'vecinomio@gmail.com', description: 'Enter the desired Email for the Job notifications')
     choice(choices: getRegions(), name: 'AWSRegion', description: 'Choose the desired AWS region')
@@ -110,7 +110,7 @@ pipeline {
       steps {
         script {
           try {
-            dockerImage = docker.build("${ECRURI}/${AppRepoName}:${Tag}", "--build-arg tomcat_version=${tomcatVersion} .")
+            dockerImage = docker.build("${ECRURI}/${AppRepoName}:${Tag}", "--build-arg tomcat_version=${TomcatVersion} .")
             currentBuild.result = 'SUCCESS'
           }
           catch (err) {
