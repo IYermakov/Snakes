@@ -1,6 +1,6 @@
 FROM alpine
 
-ENV tomcat_version=9.0.29
+ARG tomcat_version=9.0.30
 
 LABEL maintainer="devopsa3"
 
