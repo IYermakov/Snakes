@@ -129,7 +129,7 @@ pipeline {
       steps {
         script {
           try {
-            testContainer = dockerImage.run('-p 8090:8080 --name test')
+            testContainer = dockerImage.run('-p 8090:8080')
             retry(10) {
               sh 'sleep 5'
               sh 'curl -sS http://localhost:8090 | grep "Does it have snakes?"'
