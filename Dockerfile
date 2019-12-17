@@ -6,8 +6,6 @@ LABEL maintainer="devopsa3"
 
 RUN apk add openjdk8 curl
 
-RUN echo TVER == ${tomcat_version}
-
 RUN cd /usr/local/ \
   && tomcat_ver_maj_okt=$(echo ${tomcat_version} | cut -d '.' -f 1) \
   && wget http://apache.ip-connect.vn.ua/tomcat/tomcat-${tomcat_ver_maj_okt}/v${tomcat_version}/bin/apache-tomcat-${tomcat_version}.tar.gz \
