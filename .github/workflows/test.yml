@@ -2,6 +2,7 @@ name: Docker Image CI
 env:
   ECRURI: 054017840000.dkr.ecr.us-east-1.amazonaws.com
   AppRepoName: snakes
+  Tag: $(date +%s)
 
 on:
   push:
@@ -18,12 +19,12 @@ jobs:
     - name: Build the App
       run: cd eb-tomcat-snakes && ./build.sh
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag $ECRURI/$AppRepoName:$(date +%s)
+      run: docker build . --file Dockerfile --tag $ECRURI/$AppRepoName:$Tag
     - name: Test
       run: |
-        docker run -d -p 8090:8080 --name test $ECRURI/$AppRepoName:$(date +%s)
+        docker run -d -p 8090:8080 --name test $ECRURI/$AppRepoName:$Tag
         sleep 10
         curl -sS http://localhost:8090 | grep "Does it have snakes?"
         docker rm -f test
-        
-      
+    - name: check
+      run: docker images
