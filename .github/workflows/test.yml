@@ -26,7 +26,7 @@ jobs:
         echo " *** ORIGIN VERSION A=$A, B=$B, C=$C *** "
         C=$((C+1))
         localTag="$A.$B.$C"
-        echo ::set-env name=Tag::$(echo localTag)
+        echo ::set-env name=Tag::$(echo $localTag)
 
     - name: Build the App
       run: cd eb-tomcat-snakes && ./build.sh
