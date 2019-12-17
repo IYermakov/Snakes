@@ -1,0 +1,29 @@
+name: Docker Image CI
+env:
+  ECRURI: 054017840000.dkr.ecr.us-east-1.amazonaws.com
+  AppRepoName: snakes
+
+on:
+  push:
+    branches: master-demo
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build the App
+      run: cd eb-tomcat-snakes && ./build.sh
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag $ECRURI/$AppRepoName:$(date +%s)
+    - name: Test
+      run: |
+        docker run -d -p 8090:8080 --name test $ECRURI/$AppRepoName:$(date +%s)
+        sleep 10
+        curl -sS http://localhost:8090 | grep "Does it have snakes?"
+        docker rm -f test
+        
+      
