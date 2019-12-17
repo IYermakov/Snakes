@@ -2,7 +2,6 @@ name: Snakes CI
 env:
   ECRURI: 054017840000.dkr.ecr.us-east-1.amazonaws.com
   AppRepoName: snakes
-  Tag: ${{ github.sha }}
   StartVersionFrom: 0.0.1
 
 on:
@@ -25,12 +24,9 @@ jobs:
         B=$(echo $version | cut -d '.' -f 2)
         C=$(echo $version | cut -d '.' -f 3)
         echo " *** ORIGIN VERSION A=$A, B=$B, C=$C *** "
-        C=$(echo $version | cut -d '.' -f 3)
-        echo $C
         C=$((C+1))
-        echo "$A.$B.$C"
-        Tag="$A.$B.$C"
-        echo $Tag
+        localTag="$A.$B.$C"
+        echo ::set-env name=Tag::$(localTag)
 
     - name: Build the App
       run: cd eb-tomcat-snakes && ./build.sh
