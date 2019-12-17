@@ -2,7 +2,7 @@ name: Docker Image CI
 env:
   ECRURI: 054017840000.dkr.ecr.us-east-1.amazonaws.com
   AppRepoName: snakes
-  Tag: $(date +%s)
+  Tag: ${{ github.sha }}
 
 on:
   push:
